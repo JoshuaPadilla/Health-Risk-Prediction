@@ -11,9 +11,9 @@ app = FastAPI()
 # We load all 3 models + the Scaler into memory when the server starts.
 # Ensure these filenames match EXACTLY what your training script saved.
 models = {
-    "logistic": joblib.load("Logistic Regression_model.pkl"),
-    "svm": joblib.load("SVM_model.pkl"),
-    "forest": joblib.load("Random Forest_model.pkl"),
+    "logistic": joblib.load("logistic_regression_model.pkl"),
+    "svm": joblib.load("svm_model.pkl"),
+    "forest": joblib.load("random_forest_model.pkl"),
 }
 scaler = joblib.load("scaler.pkl")
 
