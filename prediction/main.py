@@ -98,4 +98,4 @@ def predict_health_risk(model_name: str, data: StudentHealthData):
     }
 
 
-# python -m uvicorn main:app --reload
+# python -m uvicorn main:app --reload --host 0.0.0.0 --port 8001
