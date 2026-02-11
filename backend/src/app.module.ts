@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { HttpModule } from '@nestjs/axios';
+import { PredictionModule } from './endpoints/prediction/prediction.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       database: 'kurt_thesis',
       synchronize: true,
     }),
+
+    PredictionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

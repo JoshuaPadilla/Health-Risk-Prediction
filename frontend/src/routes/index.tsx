@@ -20,7 +20,7 @@ function Home() {
 	const navigate = useNavigate();
 
 	return (
-		<div className="min-h-screen bg-white text-slate-900 font-sans flex flex-col">
+		<div className="px-32 min-h-screen bg-white text-slate-900 font-sans flex flex-col">
 			<main className="flex-1">
 				{/* --- Hero Section --- */}
 				<section className="container max-h-200 mx-auto px-4 py-12 md:py-20 lg:py-28">
@@ -75,9 +75,9 @@ function Home() {
 						</div>
 
 						{/* Right Image/Visual */}
-						<div className="relative w-full flex justify-center lg:justify-start ">
+						<div className="py-16 relative w-full flex justify-center lg:justify-start ">
 							{/* Image Container matching the card look */}
-							<div className="w-full p-4 relative rounded-3xl overflow-hidden shadow-2xl shadow-slate-200 bg-slate-900 ring-1 ring-slate-900/5 group">
+							<div className="w-full relative rounded-3xl overflow-hidden shadow-2xl shadow-slate-200 bg-slate-900 ring-1 ring-slate-900/5 group">
 								{/* The actual image */}
 								<img
 									src={hero_image}
@@ -245,17 +245,15 @@ function Home() {
 							<span className="font-semibold text-slate-500">
 								Disclaimer:
 							</span>{" "}
-							The NWSSU Health AI tool is for informational
-							purposes only and is not a substitute for
-							professional medical diagnosis, advice, or
-							treatment. Always seek the advice of your physician
-							or other qualified health provider with any
-							questions you may have regarding a medical
+							BioMetric is for informational purposes only and is
+							not a substitute for professional medical diagnosis,
+							advice, or treatment. Always seek the advice of your
+							physician or other qualified health provider with
+							any questions you may have regarding a medical
 							condition.
 						</p>
 						<p className="text-xs text-slate-300 mt-4">
-							© 2023 Northwest Samar State University. All rights
-							reserved.
+							© 2023 BioMetric. All rights reserved.
 						</p>
 					</div>
 				</div>

@@ -4,6 +4,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
+import { Toaster } from "./components/ui/sonner";
 
 const router = createRouter({
 	routeTree,
@@ -31,6 +32,7 @@ if (!rootElement.innerHTML) {
 	root.render(
 		<StrictMode>
 			<App />
+			<Toaster />
 		</StrictMode>,
 	);
 }
