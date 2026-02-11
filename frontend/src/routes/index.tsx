@@ -44,7 +44,7 @@ function Home() {
 							<p className="text-lg text-slate-500 max-w-lg leading-relaxed">
 								Advanced Health Risk Prediction for NWSSU
 								Students. Powered by state-of-the-art AI
-								benchmarking models to ensure accuracy and
+								benchmarked models to ensure accuracy and
 								privacy.
 							</p>
 
@@ -70,7 +70,7 @@ function Home() {
 
 							{/* Footer note */}
 							<p className="text-xs font-medium text-slate-400">
-								* Takes approx. 5 minutes to complete.
+								* Takes approx a few seconds to complete.
 							</p>
 						</div>
 
@@ -208,13 +208,13 @@ function Home() {
 				<div className="container mx-auto px-4">
 					<div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
 						<div className="flex items-center gap-2 font-heading font-bold">
-							<div className="h-6 w-6 bg-slate-900 rounded-md flex items-center justify-center">
-								<span className="text-white text-xs font-bold">
-									+
-								</span>
-							</div>
-							<span className="text-sm text-slate-900">
-								NWSSU Health AI
+							<img
+								src="/BioMetric_logo.png"
+								alt="BioMetric Logo"
+								className="h-8 w-8 object-contain"
+							/>
+							<span className="font-heading text-xl font-bold tracking-tight text-foreground">
+								BioMetric
 							</span>
 						</div>
 

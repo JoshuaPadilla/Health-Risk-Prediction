@@ -17,9 +17,6 @@ export const validatePredictionForm = (
 
 	// Step 3: Vitals & Status
 	// Assuming 0 is the default "unselected" state for BMI category
-	if (data.bmi_category === 0) {
-		errors.push("Please select a BMI Category.");
-	}
 
 	if (data.heart_rate <= 0) errors.push("Please enter a valid Heart Rate.");
 	if (data.systolic_bp <= 0) errors.push("Please enter a valid Systolic BP.");

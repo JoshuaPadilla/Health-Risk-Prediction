@@ -13,7 +13,7 @@
         "precision": 96.0,
         "recall": 96.0,
         "f1_score": 96.0,
-        "status": "Deployed"
+        "status": "Ready"
     },
     {
         "algorithm": "Random Forest",

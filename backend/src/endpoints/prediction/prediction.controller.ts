@@ -1,12 +1,14 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { PredictionService } from './prediction.service';
+import { PredictionFormDto } from 'src/dto/prediction_form_dto';
 
 @Controller('prediction')
 export class PredictionController {
   constructor(private readonly predictionService: PredictionService) {}
 
-  @Post('forest')
-  predictForest(@Body() body: any) {
-    return this.predictionService.forestPredict(body);
+  @Post('predict')
+  predictForest(@Body() body: PredictionFormDto) {
+    console.log(body);
+    return this.predictionService.predict(body);
   }
 }

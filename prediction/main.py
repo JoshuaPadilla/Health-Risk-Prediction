@@ -37,6 +37,7 @@ class StudentHealthData(BaseModel):
 # --- 3. The API Endpoint ---
 @app.post("/predict/{model_name}")
 def predict_health_risk(model_name: str, data: StudentHealthData):
+    print(data)
     # A. Select the Model
     if model_name not in models:
         raise HTTPException(
@@ -82,7 +83,7 @@ def predict_health_risk(model_name: str, data: StudentHealthData):
     # C. Scale the Data (Crucial Step!)
     # We must apply the same math (Z-score) used during training.
     scaled_data = scaler.transform(input_data)
-
+    print(input_data)
     # D. Predict
     prediction = selected_model.predict(scaled_data)  # Returns [0] or [1]
     probability = selected_model.predict_proba(scaled_data)[0][

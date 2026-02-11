@@ -8,7 +8,7 @@ type StoreProps = {
 
 export const usePredictionStore = create<StoreProps>(() => ({
 	sendPrediction: async (form) => {
-		const res = await fetch(`${BaseUrl}prediction/${form.model}`, {
+		const res = await fetch(`${BaseUrl}prediction/predict`, {
 			method: "POST",
 			body: JSON.stringify(form),
 			headers: {
@@ -17,7 +17,7 @@ export const usePredictionStore = create<StoreProps>(() => ({
 		});
 
 		const data = await res.json();
-
+		console.log("Data result:", data);
 		return data;
 	},
 }));

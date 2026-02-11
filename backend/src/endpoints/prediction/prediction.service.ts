@@ -1,13 +1,14 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
+import { PredictionFormDto } from 'src/dto/prediction_form_dto';
 
 @Injectable()
 export class PredictionService {
   constructor(private readonly httpService: HttpService) {}
 
-  async forestPredict(data: any) {
-    const request$ = this.httpService.post('predict/forest', data, {
+  async predict(data: PredictionFormDto) {
+    const request$ = this.httpService.post(`predict/${data.model}`, data, {
       headers: {
         'Content-Type': 'application/json',
       },
