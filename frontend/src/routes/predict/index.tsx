@@ -1,13 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
 	ArrowLeft,
 	ArrowRight,
 	Activity,
 	Moon,
-	User,
 	Check,
-	HeartPulse,
 	Ruler,
 	Weight,
 	Timer,
@@ -28,50 +26,33 @@ import { Assessment_Steps } from "@/static_data/assessment_steps";
 import { toast } from "sonner";
 import { validatePredictionForm } from "@/helpers/form_validatation";
 import { usePredictionStore } from "@/stores/prediction_store";
+import type { PredictionForm } from "@/types/prediction_form";
+import { PredictionLoading } from "@/components/custom_components/prediction_loading";
 
-// ----------------------------------------------------------------------
-// Types
-// ----------------------------------------------------------------------
-export type PredictionForm = {
-	gender: number;
-	height: number;
-	weight: number;
-	age: number;
-	sleep_duration: number;
-	physical_activity: number;
-	daily_steps: number;
-	stress_level: number;
-	quality_of_sleep: number;
-	bmi_category: number;
-	heart_rate: number;
-	systolic_bp: number;
-	diastolic_bp: number;
-	model: "logistic" | "svm" | "forest";
-};
-
-export const Route = createFileRoute("/assess")({
+export const Route = createFileRoute("/predict/")({
 	component: RouteComponent,
 });
 
 function RouteComponent() {
-	const { sendPrediction } = usePredictionStore();
+	const navigate = useNavigate();
+	const { sendPrediction, isLoading } = usePredictionStore();
 	const [step, setStep] = useState(1);
 	const totalSteps = 4; // Increased to 4 to accommodate Model Selection cleanly
 
 	const [formData, setFormData] = useState<PredictionForm>({
 		gender: 0,
-		age: 0,
-		height: 0,
-		weight: 0,
-		sleep_duration: 7,
-		physical_activity: 0,
-		daily_steps: 0,
-		stress_level: 5,
-		quality_of_sleep: 5,
-		bmi_category: 0,
-		heart_rate: 0,
-		systolic_bp: 0,
-		diastolic_bp: 0,
+		age: 24,
+		height: 168,
+		weight: 82,
+		sleep_duration: 5,
+		physical_activity: 100,
+		daily_steps: 8000,
+		stress_level: 8,
+		quality_of_sleep: 4,
+		bmi_category: 1,
+		heart_rate: 75,
+		systolic_bp: 120,
+		diastolic_bp: 80,
 		model: "forest",
 	});
 
@@ -120,19 +101,9 @@ function RouteComponent() {
 		// 2. Submit Data (If valid)
 		try {
 			// Show loading state
-			const promise = sendPrediction(formData); // Simulate API call
+			await sendPrediction(formData); // Simulate API call
 
-			toast.promise(promise, {
-				loading: "Analyzing health data...",
-				success: (data) => {
-					console.log("Form Data Submitted:", formData);
-					return "Prediction complete!";
-				},
-				error: "Error connecting to prediction server",
-			});
-
-			// Actual API call would go here:
-			// await api.post('/predict', formData);
+			navigate({ to: "/predict/result" });
 		} catch (error) {
 			console.error(error);
 			toast.error("Submission Failed");
@@ -141,6 +112,8 @@ function RouteComponent() {
 
 	return (
 		<div className="min-h-screen bg-slate-50 p-4 md:p-8 flex justify-center items-start font-sans text-slate-900">
+			{isLoading && <PredictionLoading />}
+
 			<div className="w-full max-w-3xl space-y-6">
 				{/* Header */}
 				<div className="flex flex-col md:flex-row justify-between items-end md:items-center gap-4">

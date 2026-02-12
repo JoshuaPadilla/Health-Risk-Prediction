@@ -1,4 +1,4 @@
-import type { PredictionForm } from "@/routes/assess"; // Adjust path as needed
+import type { PredictionForm } from "@/types/prediction_form";
 
 export const validatePredictionForm = (
 	data: PredictionForm,

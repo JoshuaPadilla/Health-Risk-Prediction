@@ -5,11 +5,12 @@ import "./index.css";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { Toaster } from "./components/ui/sonner";
+import { usePredictionStore } from "./stores/prediction_store";
 
 const router = createRouter({
 	routeTree,
 	context: {
-		user: undefined!,
+		prediction: undefined!,
 	},
 });
 
@@ -21,9 +22,8 @@ declare module "@tanstack/react-router" {
 
 // eslint-disable-next-line react-refresh/only-export-components
 function App() {
-	const user = "ME";
-	// 2. Pass the live state into the context prop
-	return <RouterProvider router={router} context={{ user }} />;
+	const prediction = usePredictionStore(); // 2. Pass the live state into the context prop
+	return <RouterProvider router={router} context={{ prediction }} />;
 }
 
 const rootElement = document.getElementById("root")!;

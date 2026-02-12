@@ -19,7 +19,7 @@ import {
 const navItems = [
 	{ label: "Home", href: "/" },
 	{ label: "Model Benchmarking", href: "/model-benchmarking" },
-	{ label: "Assess", href: "/assess" },
+	{ label: "Predict", href: "/predict" },
 	{ label: "About", href: "/about" },
 ];
 

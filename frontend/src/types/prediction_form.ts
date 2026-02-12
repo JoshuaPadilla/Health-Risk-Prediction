@@ -1,3 +1,5 @@
+import { type Model } from "@/enums/models.enum";
+
 export type PredictionForm = {
 	gender: number;
 	height: number;
@@ -12,5 +14,5 @@ export type PredictionForm = {
 	heart_rate: number;
 	systolic_bp: number;
 	diastolic_bp: number;
-	model: "logistic" | "svm" | "forest";
+	model: Model;
 };
