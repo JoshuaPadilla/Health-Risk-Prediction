@@ -11,121 +11,265 @@ import {
 	GraduationCap,
 	Sparkles,
 } from "lucide-react";
+import { motion, type Variants } from "framer-motion";
 import hero_image from "../../public/homepage-image.png";
 
 export const Route = createFileRoute("/")({
 	component: Home,
 });
 
+// --- Animation Variants ---
+
+const fadeInUp: Variants = {
+	hidden: { opacity: 0, y: 30 },
+	visible: {
+		opacity: 1,
+		y: 0,
+		transition: { duration: 0.6, ease: "easeOut" },
+	},
+};
+
+const staggerContainer: Variants = {
+	hidden: { opacity: 0 },
+	visible: {
+		opacity: 1,
+		transition: {
+			staggerChildren: 0.15,
+			delayChildren: 0.2,
+		},
+	},
+};
+
+const scaleIn: Variants = {
+	hidden: { opacity: 0, scale: 0.9 },
+	visible: {
+		opacity: 1,
+		scale: 1,
+		transition: { duration: 0.5 },
+	},
+};
+
+const float: Variants = {
+	animate: {
+		y: [0, -15, 0],
+		transition: {
+			duration: 6,
+			repeat: Infinity,
+			ease: "easeInOut",
+		},
+	},
+};
+
 function Home() {
 	const navigate = useNavigate();
 
 	return (
-		<div className="min-h-screen bg-linear-to-b from-white via-blue-50/30 to-white text-slate-900 font-sans flex flex-col px-32">
+		<div className="min-h-screen bg-gradient-to-b from-white via-blue-50/30 to-white text-slate-900 font-sans flex flex-col px-4 md:px-32 overflow-hidden">
 			<main className="flex-1">
 				{/* --- Hero Section --- */}
-				<section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 lg:py-24 xl:py-28">
+				<section className="container mx-auto py-12 md:py-16 lg:py-24 xl:py-28">
 					<div className="grid lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 items-center">
 						{/* Left Content */}
-						<div className="space-y-6 md:space-y-8 max-w-2xl animate-fade-in-up">
+						<motion.div
+							className="space-y-6 md:space-y-8 max-w-2xl"
+							variants={staggerContainer}
+							initial="hidden"
+							animate="visible"
+						>
 							{/* Badge */}
-							<div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-50 to-blue-100 px-4 py-2 text-xs font-bold text-blue-700 uppercase tracking-wider shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105">
-								<GraduationCap className="h-4 w-4 animate-bounce-subtle" />
-								Thesis of Group 2
-							</div>
+							<motion.div variants={fadeInUp}>
+								<div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-50 to-blue-100 px-4 py-2 text-xs font-bold text-blue-700 uppercase tracking-wider shadow-sm hover:shadow-md transition-shadow">
+									<GraduationCap className="h-4 w-4" />
+									Thesis of Group 2
+								</div>
+							</motion.div>
 
 							{/* Heading */}
-							<h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.1]">
+							<motion.h1
+								className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.1]"
+								variants={fadeInUp}
+							>
 								Predict Your <br />
 								<span className="relative inline-block">
 									Health Risks
-									<svg
-										className="absolute -bottom-2 left-0 w-full h-3 text-blue-200 animate-draw-line"
+									<motion.svg
+										className="absolute -bottom-2 left-0 w-full h-3 text-blue-200"
 										viewBox="0 0 300 12"
 										fill="none"
 										xmlns="http://www.w3.org/2000/svg"
 									>
-										<path
+										<motion.path
 											d="M2 10C50 5 100 2 150 5C200 8 250 3 298 7"
 											stroke="currentColor"
 											strokeWidth="3"
 											strokeLinecap="round"
+											initial={{ pathLength: 0 }}
+											animate={{ pathLength: 1 }}
+											transition={{
+												duration: 1,
+												delay: 0.8,
+												ease: "easeInOut",
+											}}
 										/>
-									</svg>
+									</motion.svg>
 								</span>{" "}
 								<br />
 								with{" "}
-								<span className="bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent animate-gradient">
+								<span className="bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
 									AI
 								</span>
-							</h1>
+							</motion.h1>
 
 							{/* Subtext */}
-							<p className="text-base md:text-lg text-slate-600 max-w-lg leading-relaxed">
+							<motion.p
+								className="text-base md:text-lg text-slate-600 max-w-lg leading-relaxed"
+								variants={fadeInUp}
+							>
 								Advanced Health Risk Prediction for NWSSU
 								Students. Powered by state-of-the-art AI
 								benchmarked models to ensure accuracy and
 								privacy.
-							</p>
+							</motion.p>
 
 							{/* Buttons */}
-							<div className="flex flex-col sm:flex-row gap-4 pt-2">
-								<Button
-									size="lg"
-									className="group h-12 md:h-14 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-6 md:px-8 text-base font-semibold shadow-lg shadow-blue-600/30 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-blue-600/40"
-									onClick={() => navigate({ to: "/predict" })}
+							<motion.div
+								className="flex flex-col sm:flex-row gap-4 pt-2"
+								variants={fadeInUp}
+							>
+								<motion.div
+									whileHover={{ scale: 1.05 }}
+									whileTap={{ scale: 0.95 }}
 								>
-									Start Prediction
-									<ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-								</Button>
-								<Button
-									variant="outline"
-									size="lg"
-									className="h-12 md:h-14 px-6 md:px-8 rounded-xl border-2 border-slate-200 bg-white text-slate-900 text-base font-semibold shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-lg hover:bg-slate-50 hover:border-slate-300 active:scale-[0.98]"
+									<Button
+										size="lg"
+										className="group h-12 md:h-14 w-full sm:w-auto rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-6 md:px-8 text-base font-semibold shadow-lg shadow-blue-600/30"
+										onClick={() =>
+											navigate({ to: "/predict" })
+										}
+									>
+										Start Prediction
+										<ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+									</Button>
+								</motion.div>
+
+								<motion.div
+									whileHover={{ scale: 1.05 }}
+									whileTap={{ scale: 0.95 }}
 								>
-									Learn Methodology
-								</Button>
-							</div>
+									<Button
+										variant="outline"
+										size="lg"
+										className="h-12 md:h-14 w-full sm:w-auto px-6 md:px-8 rounded-xl border-2 border-slate-200 bg-white text-slate-900 text-base font-semibold shadow-sm hover:bg-slate-50 hover:border-slate-300"
+									>
+										Learn Methodology
+									</Button>
+								</motion.div>
+							</motion.div>
 
 							{/* Footer note */}
-							<div className="flex items-center gap-2 text-xs md:text-sm font-medium text-slate-400 animate-pulse-subtle">
+							<motion.div
+								className="flex items-center gap-2 text-xs md:text-sm font-medium text-slate-400"
+								variants={fadeInUp}
+							>
 								<Sparkles className="h-4 w-4 text-blue-400" />
 								Takes approx a few seconds to complete.
-							</div>
-						</div>
+							</motion.div>
+						</motion.div>
 
 						{/* Right Image/Visual */}
-						<div className="relative w-full flex justify-center lg:justify-end animate-fade-in-right">
+						<motion.div
+							className="relative w-full flex justify-center lg:justify-end"
+							initial={{ opacity: 0, x: 50 }}
+							animate={{ opacity: 1, x: 0 }}
+							transition={{
+								duration: 0.8,
+								ease: "easeOut",
+								delay: 0.2,
+							}}
+						>
 							{/* Floating particles effect */}
 							<div className="absolute inset-0 overflow-hidden pointer-events-none">
-								<div className="absolute top-1/4 left-1/4 w-2 h-2 bg-blue-400 rounded-full animate-float-slow opacity-60"></div>
-								<div className="absolute top-1/2 right-1/3 w-3 h-3 bg-blue-300 rounded-full animate-float-medium opacity-40"></div>
-								<div className="absolute bottom-1/3 left-1/2 w-2 h-2 bg-blue-500 rounded-full animate-float-fast opacity-50"></div>
+								<motion.div
+									className="absolute top-1/4 left-1/4 w-2 h-2 bg-blue-400 rounded-full opacity-60"
+									animate={{
+										y: [0, -20, 0],
+										opacity: [0.6, 1, 0.6],
+									}}
+									transition={{
+										duration: 4,
+										repeat: Infinity,
+										ease: "easeInOut",
+									}}
+								/>
+								<motion.div
+									className="absolute top-1/2 right-1/3 w-3 h-3 bg-blue-300 rounded-full opacity-40"
+									animate={{ y: [0, 15, 0], x: [0, 10, 0] }}
+									transition={{
+										duration: 5,
+										repeat: Infinity,
+										ease: "easeInOut",
+										delay: 1,
+									}}
+								/>
+								<motion.div
+									className="absolute bottom-1/3 left-1/2 w-2 h-2 bg-blue-500 rounded-full opacity-50"
+									animate={{ y: [0, -25, 0] }}
+									transition={{
+										duration: 3.5,
+										repeat: Infinity,
+										ease: "easeInOut",
+										delay: 0.5,
+									}}
+								/>
 							</div>
 
-							{/* Image Container */}
-							<div className="w-full max-w-[600px] relative rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl shadow-slate-300/50 bg-slate-900 ring-1 ring-slate-900/5 group transform transition-all duration-500 hover:scale-[1.02] hover:shadow-3xl hover:shadow-blue-500/20">
-								{/* The actual image */}
+							{/* Image Container with Float Animation */}
+							<motion.div
+								className="w-full max-w-[600px] relative rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl shadow-slate-300/50 bg-slate-900 ring-1 ring-slate-900/5 z-10"
+								variants={float}
+								animate="animate"
+								whileHover={{
+									scale: 1.02,
+									transition: { duration: 0.3 },
+								}}
+							>
 								<img
 									src={hero_image}
-									className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+									className="w-full h-auto object-cover"
 									alt="AI Health Analysis Dashboard"
 								/>
 
-								{/* Animated border gradient */}
-								<div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-gradient-to-tr from-blue-500/20 via-transparent to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-							</div>
+								{/* Animated sheen on hover */}
+								<motion.div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+							</motion.div>
 
 							{/* Decorative background element */}
-							<div className="absolute -inset-8 -z-10 bg-gradient-to-tr from-blue-100 via-blue-50 to-transparent rounded-full blur-3xl opacity-60 animate-pulse-slow" />
-						</div>
+							<motion.div
+								className="absolute -inset-8 -z-10 bg-gradient-to-tr from-blue-100 via-blue-50 to-transparent rounded-full blur-3xl opacity-60"
+								animate={{
+									scale: [1, 1.1, 1],
+									opacity: [0.5, 0.7, 0.5],
+								}}
+								transition={{
+									duration: 8,
+									repeat: Infinity,
+									ease: "easeInOut",
+								}}
+							/>
+						</motion.div>
 					</div>
 				</section>
 
 				{/* --- Features Section --- */}
 				<section className="bg-gradient-to-b from-slate-50 via-white to-slate-50 py-16 md:py-24 border-y border-slate-100">
 					<div className="container mx-auto px-4 sm:px-6 lg:px-8">
-						<div className="text-center max-w-3xl mx-auto mb-12 md:mb-16 animate-fade-in">
+						<motion.div
+							className="text-center max-w-3xl mx-auto mb-12 md:mb-16"
+							initial="hidden"
+							whileInView="visible"
+							viewport={{ once: true, margin: "-100px" }}
+							variants={fadeInUp}
+						>
 							<div className="inline-block mb-4">
 								<span className="text-sm font-bold text-blue-600 uppercase tracking-wider bg-blue-50 px-4 py-1.5 rounded-full">
 									Features
@@ -139,11 +283,25 @@ function Home() {
 								to provide accurate, data-driven health risk
 								assessments tailored for the student body.
 							</p>
-						</div>
+						</motion.div>
 
-						<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+						<motion.div
+							className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+							variants={staggerContainer}
+							initial="hidden"
+							whileInView="visible"
+							viewport={{ once: true, margin: "-50px" }}
+						>
 							{/* Feature 1 */}
-							<div className="group bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 hover:-translate-y-2 animate-fade-in-up animation-delay-100">
+							<motion.div
+								className="group bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-sm"
+								variants={fadeInUp}
+								whileHover={{
+									y: -8,
+									boxShadow:
+										"0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+								}}
+							>
 								<div className="h-12 w-12 md:h-14 md:w-14 bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-sm">
 									<BarChart3 className="h-6 w-6 md:h-7 md:w-7" />
 								</div>
@@ -156,10 +314,18 @@ function Home() {
 									Networks) to ensure the highest possible
 									accuracy for your profile.
 								</p>
-							</div>
+							</motion.div>
 
 							{/* Feature 2 */}
-							<div className="group bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 hover:-translate-y-2 animate-fade-in-up animation-delay-200">
+							<motion.div
+								className="group bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-sm"
+								variants={fadeInUp}
+								whileHover={{
+									y: -8,
+									boxShadow:
+										"0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+								}}
+							>
 								<div className="h-12 w-12 md:h-14 md:w-14 bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-sm">
 									<ShieldCheck className="h-6 w-6 md:h-7 md:w-7" />
 								</div>
@@ -172,10 +338,18 @@ function Home() {
 									privacy standards. No personal identifiers
 									are stored publicly.
 								</p>
-							</div>
+							</motion.div>
 
 							{/* Feature 3 */}
-							<div className="group bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 hover:-translate-y-2 animate-fade-in-up animation-delay-300 sm:col-span-2 lg:col-span-1">
+							<motion.div
+								className="group bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-sm sm:col-span-2 lg:col-span-1"
+								variants={fadeInUp}
+								whileHover={{
+									y: -8,
+									boxShadow:
+										"0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+								}}
+							>
 								<div className="h-12 w-12 md:h-14 md:w-14 bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-sm">
 									<Zap className="h-6 w-6 md:h-7 md:w-7" />
 								</div>
@@ -188,15 +362,30 @@ function Home() {
 									after completing the assessment
 									questionnaire.
 								</p>
-							</div>
-						</div>
+							</motion.div>
+						</motion.div>
 
 						{/* --- Steps Process --- */}
 						<div className="mt-20 md:mt-32 max-w-5xl mx-auto px-4 sm:px-6">
-							<div className="bg-white rounded-2xl p-6 md:p-10 shadow-lg border border-slate-100">
-								<div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-6">
+							<motion.div
+								className="bg-white rounded-2xl p-6 md:p-10 shadow-lg border border-slate-100"
+								initial={{ opacity: 0, scale: 0.95 }}
+								whileInView={{ opacity: 1, scale: 1 }}
+								viewport={{ once: true, margin: "-100px" }}
+								transition={{ duration: 0.6 }}
+							>
+								<motion.div
+									className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-6"
+									variants={staggerContainer}
+									initial="hidden"
+									whileInView="visible"
+									viewport={{ once: true }}
+								>
 									{/* Step 1 */}
-									<div className="group flex flex-col items-center text-center gap-3 flex-1 animate-fade-in-up animation-delay-100">
+									<motion.div
+										className="group flex flex-col items-center text-center gap-3 flex-1"
+										variants={scaleIn}
+									>
 										<div className="relative">
 											<div className="h-16 w-16 md:h-20 md:w-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-md">
 												<FileText className="h-8 w-8 md:h-10 md:w-10 text-slate-600" />
@@ -208,18 +397,24 @@ function Home() {
 										<span className="font-heading font-bold text-base md:text-lg tracking-tight text-slate-700">
 											Input Data
 										</span>
-									</div>
+									</motion.div>
 
 									{/* Arrow 1 */}
-									<div className="hidden md:flex items-center flex-shrink-0">
-										<ArrowRight className="h-6 w-6 text-slate-300 animate-pulse-subtle" />
-									</div>
-									<div className="md:hidden">
-										<div className="h-8 w-0.5 bg-slate-200"></div>
-									</div>
+									<motion.div
+										className="hidden md:flex items-center flex-shrink-0"
+										initial={{ opacity: 0, x: -10 }}
+										whileInView={{ opacity: 1, x: 0 }}
+										transition={{ delay: 0.3 }}
+									>
+										<ArrowRight className="h-6 w-6 text-slate-300" />
+									</motion.div>
+									<div className="md:hidden h-8 w-0.5 bg-slate-200"></div>
 
 									{/* Step 2 */}
-									<div className="group flex flex-col items-center text-center gap-3 flex-1 animate-fade-in-up animation-delay-200">
+									<motion.div
+										className="group flex flex-col items-center text-center gap-3 flex-1"
+										variants={scaleIn}
+									>
 										<div className="relative">
 											<div className="h-16 w-16 md:h-20 md:w-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-md">
 												<BrainCircuit className="h-8 w-8 md:h-10 md:w-10 text-blue-700" />
@@ -231,73 +426,90 @@ function Home() {
 										<span className="font-heading font-bold text-base md:text-lg tracking-tight text-slate-700">
 											AI Analysis
 										</span>
-									</div>
+									</motion.div>
 
 									{/* Arrow 2 */}
-									<div className="hidden md:flex items-center flex-shrink-0">
-										<ArrowRight className="h-6 w-6 text-slate-300 animate-pulse-subtle" />
-									</div>
-									<div className="md:hidden">
-										<div className="h-8 w-0.5 bg-slate-200"></div>
-									</div>
+									<motion.div
+										className="hidden md:flex items-center flex-shrink-0"
+										initial={{ opacity: 0, x: -10 }}
+										whileInView={{ opacity: 1, x: 0 }}
+										transition={{ delay: 0.5 }}
+									>
+										<ArrowRight className="h-6 w-6 text-slate-300" />
+									</motion.div>
+									<div className="md:hidden h-8 w-0.5 bg-slate-200"></div>
 
 									{/* Step 3 */}
-									<div className="group flex flex-col items-center text-center gap-3 flex-1 animate-fade-in-up animation-delay-300">
+									<motion.div
+										className="group flex flex-col items-center text-center gap-3 flex-1"
+										variants={scaleIn}
+									>
 										<div className="relative">
 											<div className="h-16 w-16 md:h-20 md:w-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-blue-500/50">
 												<Activity className="h-8 w-8 md:h-10 md:w-10 text-white" />
 											</div>
-											<div className="absolute -top-2 -right-2 h-6 w-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-lg animate-bounce-subtle">
+											<motion.div
+												className="absolute -top-2 -right-2 h-6 w-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-lg"
+												animate={{ y: [0, -4, 0] }}
+												transition={{
+													repeat: Infinity,
+													duration: 2,
+												}}
+											>
 												3
-											</div>
+											</motion.div>
 										</div>
 										<span className="font-heading font-bold text-base md:text-lg tracking-tight text-blue-600">
 											Get Profile
 										</span>
-									</div>
-								</div>
-							</div>
+									</motion.div>
+								</motion.div>
+							</motion.div>
 						</div>
 					</div>
 				</section>
 			</main>
 
 			{/* --- Footer --- */}
-			<footer className="border-t border-slate-100 py-8 md:py-12 bg-white">
+			<motion.footer
+				className="border-t border-slate-100 py-8 md:py-12 bg-white"
+				initial={{ opacity: 0 }}
+				whileInView={{ opacity: 1 }}
+				viewport={{ once: true }}
+				transition={{ duration: 0.8 }}
+			>
 				<div className="container mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
 						<div className="flex items-center gap-2 font-heading font-bold group">
-							<div className="h-8 w-8 md:h-10 md:w-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+							<motion.div
+								className="h-8 w-8 md:h-10 md:w-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center shadow-lg"
+								whileHover={{ rotate: 10, scale: 1.1 }}
+							>
 								<img
 									src="/BioMetric_logo.png"
 									alt="BioMetric Logo"
 									className="h-5 w-5 md:h-6 md:w-6 object-contain"
 								/>
-							</div>
+							</motion.div>
 							<span className="font-heading text-lg md:text-xl font-bold tracking-tight text-foreground">
 								BioMetric
 							</span>
 						</div>
 
 						<div className="flex flex-wrap justify-center gap-6 md:gap-8 text-sm text-slate-500 font-medium">
-							<Link
-								to="/"
-								className="hover:text-blue-600 transition-colors duration-300 hover:underline underline-offset-4"
-							>
-								Privacy Policy
-							</Link>
-							<Link
-								to="/"
-								className="hover:text-blue-600 transition-colors duration-300 hover:underline underline-offset-4"
-							>
-								Terms of Use
-							</Link>
-							<Link
-								to="/"
-								className="hover:text-blue-600 transition-colors duration-300 hover:underline underline-offset-4"
-							>
-								Contact Support
-							</Link>
+							{[
+								"Privacy Policy",
+								"Terms of Use",
+								"Contact Support",
+							].map((item) => (
+								<Link
+									key={item}
+									to="/"
+									className="hover:text-blue-600 transition-colors duration-300 hover:underline underline-offset-4"
+								>
+									{item}
+								</Link>
+							))}
 						</div>
 					</div>
 
@@ -318,179 +530,7 @@ function Home() {
 						</p>
 					</div>
 				</div>
-			</footer>
-
-			{/* Add custom animations in your global CSS or Tailwind config */}
-			<style>{`
-				@keyframes fade-in-up {
-					from {
-						opacity: 0;
-						transform: translateY(20px);
-					}
-					to {
-						opacity: 1;
-						transform: translateY(0);
-					}
-				}
-
-				@keyframes fade-in-right {
-					from {
-						opacity: 0;
-						transform: translateX(-20px);
-					}
-					to {
-						opacity: 1;
-						transform: translateX(0);
-					}
-				}
-
-				@keyframes fade-in {
-					from {
-						opacity: 0;
-					}
-					to {
-						opacity: 1;
-					}
-				}
-
-				@keyframes bounce-subtle {
-					0%,
-					100% {
-						transform: translateY(0);
-					}
-					50% {
-						transform: translateY(-5px);
-					}
-				}
-
-				@keyframes pulse-subtle {
-					0%,
-					100% {
-						opacity: 1;
-					}
-					50% {
-						opacity: 0.8;
-					}
-				}
-
-				@keyframes pulse-slow {
-					0%,
-					100% {
-						opacity: 0.6;
-					}
-					50% {
-						opacity: 0.8;
-					}
-				}
-
-				@keyframes float-slow {
-					0%,
-					100% {
-						transform: translate(0, 0);
-					}
-					50% {
-						transform: translate(10px, -10px);
-					}
-				}
-
-				@keyframes float-medium {
-					0%,
-					100% {
-						transform: translate(0, 0);
-					}
-					50% {
-						transform: translate(-15px, 15px);
-					}
-				}
-
-				@keyframes float-fast {
-					0%,
-					100% {
-						transform: translate(0, 0);
-					}
-					50% {
-						transform: translate(12px, -12px);
-					}
-				}
-
-				@keyframes draw-line {
-					from {
-						stroke-dasharray: 300;
-						stroke-dashoffset: 300;
-					}
-					to {
-						stroke-dasharray: 300;
-						stroke-dashoffset: 0;
-					}
-				}
-
-				@keyframes gradient {
-					0%,
-					100% {
-						background-position: 0% 50%;
-					}
-					50% {
-						background-position: 100% 50%;
-					}
-				}
-
-				.animate-fade-in-up {
-					animation: fade-in-up 0.6s ease-out;
-				}
-
-				.animate-fade-in-right {
-					animation: fade-in-right 0.8s ease-out;
-				}
-
-				.animate-fade-in {
-					animation: fade-in 0.6s ease-out;
-				}
-
-				.animate-bounce-subtle {
-					animation: bounce-subtle 2s ease-in-out infinite;
-				}
-
-				.animate-pulse-subtle {
-					animation: pulse-subtle 2s ease-in-out infinite;
-				}
-
-				.animate-pulse-slow {
-					animation: pulse-slow 4s ease-in-out infinite;
-				}
-
-				.animate-float-slow {
-					animation: float-slow 6s ease-in-out infinite;
-				}
-
-				.animate-float-medium {
-					animation: float-medium 5s ease-in-out infinite;
-				}
-
-				.animate-float-fast {
-					animation: float-fast 4s ease-in-out infinite;
-				}
-
-				.animate-draw-line {
-					animation: draw-line 1s ease-out 0.5s forwards;
-				}
-
-				.animate-gradient {
-					background-size: 200% 200%;
-					animation: gradient 3s ease infinite;
-				}
-
-				.animation-delay-100 {
-					animation-delay: 100ms;
-				}
-
-				.animation-delay-200 {
-					animation-delay: 200ms;
-				}
-
-				.animation-delay-300 {
-					animation-delay: 300ms;
-				}
-			`}</style>
+			</motion.footer>
 		</div>
 	);
 }

@@ -13,6 +13,8 @@ import {
 	Network,
 	Binary,
 	Trees,
+	Footprints,
+	HeartPulse,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,16 +30,36 @@ import { validatePredictionForm } from "@/helpers/form_validatation";
 import { usePredictionStore } from "@/stores/prediction_store";
 import type { PredictionForm } from "@/types/prediction_form";
 import { PredictionLoading } from "@/components/custom_components/prediction_loading";
+import { motion, AnimatePresence } from "framer-motion";
 
 export const Route = createFileRoute("/predict/")({
 	component: RouteComponent,
 });
 
+// --- Animation Variants ---
+const slideVariants = {
+	enter: (direction: number) => ({
+		x: direction > 0 ? 50 : -50,
+		opacity: 0,
+	}),
+	center: {
+		zIndex: 1,
+		x: 0,
+		opacity: 1,
+	},
+	exit: (direction: number) => ({
+		zIndex: 0,
+		x: direction < 0 ? 50 : -50,
+		opacity: 0,
+	}),
+};
+
 function RouteComponent() {
 	const navigate = useNavigate();
 	const { sendPrediction, isLoading } = usePredictionStore();
 	const [step, setStep] = useState(1);
-	const totalSteps = 4; // Increased to 4 to accommodate Model Selection cleanly
+	const [direction, setDirection] = useState(0);
+	const totalSteps = 4;
 
 	const [formData, setFormData] = useState<PredictionForm>({
 		gender: 0,
@@ -56,14 +78,12 @@ function RouteComponent() {
 		model: "forest",
 	});
 
-	// Helper to handle updates safely
 	const updateField = (
 		field: keyof PredictionForm,
 		value: string | number,
 	) => {
 		setFormData((prev) => ({
 			...prev,
-			// If the field is 'model', keep as string. Otherwise, convert strings to numbers.
 			[field]:
 				field === "model"
 					? value
@@ -73,17 +93,26 @@ function RouteComponent() {
 		}));
 	};
 
-	const nextStep = () => setStep((prev) => Math.min(prev + 1, totalSteps));
-	const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
+	const nextStep = () => {
+		if (step < totalSteps) {
+			setDirection(1);
+			setStep((prev) => prev + 1);
+		}
+	};
+
+	const prevStep = () => {
+		if (step > 1) {
+			setDirection(-1);
+			setStep((prev) => prev - 1);
+		}
+	};
 
 	const currentStepData = Assessment_Steps[step - 1];
 
 	const handleSubmit = async () => {
-		// 1. Run Validation
 		const validation = validatePredictionForm(formData);
 
 		if (!validation.success) {
-			// Map through the array of errors and trigger a toast for each one
 			validation.errors.forEach((errorMsg) => {
 				toast.error("Missing Fields", {
 					description: (
@@ -91,18 +120,14 @@ function RouteComponent() {
 							{errorMsg}
 						</span>
 					),
-					// Optional: Make the toast stick around a bit longer if there are many
 					duration: 4000,
 				});
 			});
 			return;
 		}
 
-		// 2. Submit Data (If valid)
 		try {
-			// Show loading state
-			await sendPrediction(formData); // Simulate API call
-
+			await sendPrediction(formData);
 			navigate({ to: "/predict/result" });
 		} catch (error) {
 			console.error(error);
@@ -111,521 +136,734 @@ function RouteComponent() {
 	};
 
 	return (
-		<div className="min-h-screen bg-slate-50 p-4 md:p-8 flex justify-center items-start font-sans text-slate-900">
+		<div className="min-h-screen bg-slate-50/50 p-4 md:p-8 flex justify-center items-center font-sans text-slate-900 overflow-hidden">
 			{isLoading && <PredictionLoading />}
 
-			<div className="w-full max-w-3xl space-y-6">
-				{/* Header */}
-				<div className="flex flex-col md:flex-row justify-between items-end md:items-center gap-4">
+			<div className="w-full max-w-4xl space-y-6">
+				{/* Header & Progress */}
+				<div className="flex flex-col md:flex-row justify-between items-end md:items-center gap-4 px-1">
 					<div>
-						<h1 className="text-2xl font-bold tracking-tight text-slate-900">
+						<motion.h1
+							initial={{ opacity: 0, y: -10 }}
+							animate={{ opacity: 1, y: 0 }}
+							className="text-3xl font-bold tracking-tight text-slate-900"
+						>
 							Health Assessment
-						</h1>
-						<p className="text-slate-500 text-sm">
-							Step {step} of {totalSteps}: {currentStepData.title}
-						</p>
+						</motion.h1>
+						<motion.p
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							transition={{ delay: 0.1 }}
+							className="text-slate-500 text-sm mt-1"
+						>
+							Step {step} of {totalSteps}:{" "}
+							<span className="font-semibold text-blue-600">
+								{currentStepData.title}
+							</span>
+						</motion.p>
 					</div>
-					<div className="flex bg-white rounded-lg p-1 shadow-sm border border-slate-200">
+
+					{/* Animated Progress Indicators */}
+					<div className="flex bg-white rounded-full p-1.5 shadow-sm border border-slate-200">
 						{Assessment_Steps.map((s) => (
-							<div
-								key={s.id}
-								className={`h-2 w-8 md:w-12 rounded-full mx-1 transition-all duration-500 ${
-									step >= s.id
-										? "bg-blue-600"
-										: "bg-slate-200"
-								}`}
-							/>
+							<div key={s.id} className="relative mx-1">
+								<motion.div
+									className={`h-2.5 rounded-full transition-colors duration-500 ${
+										step >= s.id
+											? "bg-blue-600"
+											: "bg-slate-100"
+									}`}
+									animate={{ width: step === s.id ? 48 : 12 }}
+								/>
+							</div>
 						))}
 					</div>
 				</div>
 
-				<Card className="overflow-hidden border-slate-200 shadow-xl relative min-h-[600px] flex flex-col bg-white">
-					{/* Hero Image Section */}
-					<div className="relative h-40 w-full overflow-hidden shrink-0 group">
-						<img
-							src={currentStepData.image}
-							alt={currentStepData.title}
-							className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-						/>
-						<div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
-						<div className="absolute bottom-0 left-0 p-6 text-white animate-in slide-in-from-bottom-2 fade-in duration-500">
-							<div className="flex items-center gap-2 mb-1 text-blue-300 font-medium text-xs uppercase tracking-wider">
-								<currentStepData.icon className="w-4 h-4" />
-								{currentStepData.shortTitle}
-							</div>
-							<h2 className="text-3xl font-bold">
-								{currentStepData.title}
-							</h2>
+				<Card className="overflow-hidden border-none shadow-2xl shadow-slate-200/60 relative min-h-[650px] flex flex-col bg-white rounded-3xl ring-1 ring-slate-100">
+					{/* Dynamic Hero Image Section */}
+					<div className="relative h-48 w-full overflow-hidden shrink-0">
+						<AnimatePresence mode="wait">
+							<motion.img
+								key={currentStepData.image}
+								src={currentStepData.image}
+								alt={currentStepData.title}
+								initial={{ scale: 1.1, opacity: 0 }}
+								animate={{ scale: 1, opacity: 1 }}
+								exit={{ opacity: 0 }}
+								transition={{ duration: 0.5 }}
+								className="w-full h-full object-cover absolute inset-0"
+							/>
+						</AnimatePresence>
+						<div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
+
+						<div className="absolute bottom-0 left-0 p-8 w-full">
+							<motion.div
+								key={step}
+								initial={{ opacity: 0, y: 10 }}
+								animate={{ opacity: 1, y: 0 }}
+								transition={{ delay: 0.2 }}
+							>
+								<div className="flex items-center gap-2 mb-2 text-blue-300 font-bold text-xs uppercase tracking-wider bg-slate-900/50 backdrop-blur-sm w-fit px-3 py-1 rounded-full border border-slate-700/50">
+									<currentStepData.icon className="w-3.5 h-3.5" />
+									{currentStepData.shortTitle}
+								</div>
+								<h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
+									{currentStepData.title}
+								</h2>
+							</motion.div>
 						</div>
 					</div>
 
-					<CardContent className="p-8 flex-1">
-						{/* STEP 1: DEMOGRAPHICS */}
-						{step === 1 && (
-							<div className="space-y-8 animate-in fade-in slide-in-from-right-8 duration-500">
-								<div className="space-y-4">
-									<Label className="text-base font-semibold">
-										Biological Sex
-									</Label>
-									<div className="grid grid-cols-3 gap-4">
-										{GenderOptions.map((item) => (
-											<div
-												key={item.val}
-												onClick={() =>
-													updateField(
-														"gender",
-														item.val,
-													)
-												}
-												className={cn(
-													"cursor-pointer flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 hover:bg-slate-50",
-													formData.gender === item.val
-														? "border-blue-600 bg-blue-50/50 text-blue-700 shadow-sm"
-														: "border-slate-100 text-slate-500 hover:border-slate-300",
-												)}
-											>
-												<item.icon className="w-6 h-6 mb-2" />
-												<span className="font-medium text-sm">
-													{item.label}
-												</span>
-												{formData.gender ===
-													item.val && (
-													<div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-blue-600" />
-												)}
+					{/* Scrollable Content Area */}
+					<div className="flex-1 overflow-y-auto overflow-x-hidden relative">
+						<CardContent className="p-8">
+							<AnimatePresence custom={direction} mode="wait">
+								<motion.div
+									key={step}
+									custom={direction}
+									variants={slideVariants}
+									initial="enter"
+									animate="center"
+									exit="exit"
+									transition={{
+										x: {
+											type: "spring",
+											stiffness: 300,
+											damping: 30,
+										},
+										opacity: { duration: 0.2 },
+									}}
+									className="w-full h-full"
+								>
+									{/* STEP 1: DEMOGRAPHICS */}
+									{step === 1 && (
+										<div className="space-y-8">
+											<div className="space-y-4">
+												<Label className="text-base font-semibold text-slate-900">
+													Biological Sex
+												</Label>
+												<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+													{GenderOptions.map(
+														(item) => (
+															<motion.button
+																whileHover={{
+																	scale: 1.02,
+																	y: -2,
+																}}
+																whileTap={{
+																	scale: 0.98,
+																}}
+																key={item.val}
+																onClick={() =>
+																	updateField(
+																		"gender",
+																		item.val,
+																	)
+																}
+																className={cn(
+																	"relative flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+																	formData.gender ===
+																		item.val
+																		? "border-blue-600 bg-blue-50 text-blue-700 shadow-md shadow-blue-100"
+																		: "border-slate-100 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50",
+																)}
+															>
+																<item.icon className="w-8 h-8 mb-3" />
+																<span className="font-semibold">
+																	{item.label}
+																</span>
+																{formData.gender ===
+																	item.val && (
+																	<motion.div
+																		layoutId="genderCheck"
+																		className="absolute top-3 right-3 w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-white"
+																	>
+																		<Check
+																			className="w-3 h-3"
+																			strokeWidth={
+																				3
+																			}
+																		/>
+																	</motion.div>
+																)}
+															</motion.button>
+														),
+													)}
+												</div>
 											</div>
-										))}
-									</div>
-								</div>
 
-								<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-									<div className="space-y-2">
-										<Label>Age</Label>
-										<div className="relative">
-											<Input
-												type="number"
-												value={formData.age || ""}
-												onChange={(e) =>
-													updateField(
-														"age",
-														e.target.value,
-													)
-												}
-												className="h-12 pl-4 text-lg"
-												placeholder="0"
-											/>
-											<span className="absolute right-4 top-3 text-slate-400 text-sm">
-												years
-											</span>
-										</div>
-									</div>
-									<div className="space-y-2">
-										<Label>Height</Label>
-										<div className="relative">
-											<Ruler className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
-											<Input
-												type="number"
-												value={formData.height || ""}
-												onChange={(e) =>
-													updateField(
-														"height",
-														e.target.value,
-													)
-												}
-												className="h-12 pl-10 text-lg"
-												placeholder="0"
-											/>
-											<span className="absolute right-4 top-3 text-slate-400 text-sm">
-												cm
-											</span>
-										</div>
-									</div>
-									<div className="space-y-2">
-										<Label>Weight</Label>
-										<div className="relative">
-											<Weight className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
-											<Input
-												type="number"
-												value={formData.weight || ""}
-												onChange={(e) =>
-													updateField(
-														"weight",
-														e.target.value,
-													)
-												}
-												className="h-12 pl-10 text-lg"
-												placeholder="0"
-											/>
-											<span className="absolute right-4 top-3 text-slate-400 text-sm">
-												kg
-											</span>
-										</div>
-									</div>
-								</div>
-							</div>
-						)}
-
-						{/* STEP 2: LIFESTYLE */}
-						{step === 2 && (
-							<div className="space-y-8 animate-in fade-in slide-in-from-right-8 duration-500">
-								<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-									<div className="space-y-2">
-										<Label>Sleep Duration</Label>
-										<div className="relative">
-											<Moon className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
-											<Input
-												type="number"
-												step="0.5"
-												value={formData.sleep_duration}
-												onChange={(e) =>
-													updateField(
-														"sleep_duration",
-														e.target.value,
-													)
-												}
-												className="h-12 pl-10"
-											/>
-											<span className="absolute right-4 top-3.5 text-slate-400 text-sm">
-												hours
-											</span>
-										</div>
-									</div>
-									<div className="space-y-2">
-										<Label>Physical Activity</Label>
-										<div className="relative">
-											<Timer className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
-											<Input
-												type="number"
-												value={
-													formData.physical_activity ||
-													""
-												}
-												onChange={(e) =>
-													updateField(
-														"physical_activity",
-														e.target.value,
-													)
-												}
-												className="h-12 pl-10"
-											/>
-											<span className="absolute right-4 top-3.5 text-slate-400 text-sm">
-												mins/day
-											</span>
-										</div>
-									</div>
-									<div className="md:col-span-2 space-y-2">
-										<Label>Daily Steps (Avg)</Label>
-										<Input
-											type="number"
-											value={formData.daily_steps || ""}
-											onChange={(e) =>
-												updateField(
-													"daily_steps",
-													e.target.value,
-												)
-											}
-											className="h-12"
-											placeholder="e.g. 8000"
-										/>
-									</div>
-								</div>
-
-								<div className="bg-slate-50 p-6 rounded-xl border border-slate-100 space-y-4">
-									<div className="flex justify-between items-center">
-										<Label className="text-base">
-											Perceived Stress Level
-										</Label>
-										<div className="flex items-center gap-2">
-											<span className="text-sm text-slate-400">
-												Low
-											</span>
-											<span className="font-bold text-blue-600 bg-white px-4 py-1 rounded-md shadow-sm border border-blue-100 min-w-[3rem] text-center">
-												{formData.stress_level}
-											</span>
-											<span className="text-sm text-slate-400">
-												High
-											</span>
-										</div>
-									</div>
-									<Slider
-										value={[formData.stress_level]}
-										onValueChange={(vals) =>
-											updateField("stress_level", vals[0])
-										}
-										max={10}
-										step={1}
-										className="py-2"
-									/>
-								</div>
-							</div>
-						)}
-
-						{/* STEP 3: HEALTH STATUS */}
-						{step === 3 && (
-							<div className="space-y-8 animate-in fade-in slide-in-from-right-8 duration-500">
-								<div className="space-y-3">
-									<Label className="text-base font-semibold">
-										BMI Category
-									</Label>
-									<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-										{Bmi_Category.map((item) => (
-											<button
-												key={item.val}
-												onClick={() =>
-													updateField(
-														"bmi_category",
-														item.val,
-													)
-												}
-												className={cn(
-													"text-left p-3 rounded-lg border transition-all hover:bg-slate-50 relative",
-													formData.bmi_category ===
-														item.val
-														? "border-blue-600 bg-blue-50/40 ring-1 ring-blue-600 z-10"
-														: "border-slate-200",
-												)}
-											>
-												<div className="font-medium text-slate-900">
-													{item.label}
-												</div>
-												<div className="text-xs text-slate-500 mt-0.5">
-													{item.desc}
-												</div>
-												{formData.bmi_category ===
-													item.val && (
-													<div className="absolute top-2 right-2 text-blue-600">
-														<Check className="w-4 h-4" />
+											<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+												<div className="space-y-2 group">
+													<Label className="group-focus-within:text-blue-600 transition-colors">
+														Age
+													</Label>
+													<div className="relative">
+														<Input
+															type="number"
+															value={
+																formData.age ||
+																""
+															}
+															onChange={(e) =>
+																updateField(
+																	"age",
+																	e.target
+																		.value,
+																)
+															}
+															className="h-14 pl-4 text-lg bg-slate-50 border-transparent focus:bg-white focus:border-blue-500 transition-all shadow-inner"
+															placeholder="0"
+														/>
+														<span className="absolute right-4 top-4 text-slate-400 text-sm font-medium">
+															years
+														</span>
 													</div>
-												)}
-											</button>
-										))}
-									</div>
-								</div>
-
-								<div className="space-y-3">
-									<Label>Quality of Sleep (1-10)</Label>
-									<div className="flex flex-wrap gap-2 justify-between">
-										{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
-											(num) => (
-												<button
-													key={num}
-													onClick={() =>
-														updateField(
-															"quality_of_sleep",
-															num,
-														)
-													}
-													className={cn(
-														"h-10 w-10 rounded-md border text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-600",
-														formData.quality_of_sleep ===
-															num
-															? "bg-slate-900 text-white border-slate-900"
-															: "bg-white text-slate-700 border-slate-200 hover:bg-slate-100",
-													)}
-												>
-													{num}
-												</button>
-											),
-										)}
-									</div>
-								</div>
-
-								<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-									<div className="space-y-2">
-										<Label>Resting Heart Rate</Label>
-										<div className="relative">
-											<Activity className="absolute left-3 top-3.5 h-5 w-5 text-red-500" />
-											<Input
-												type="number"
-												value={
-													formData.heart_rate || ""
-												}
-												onChange={(e) =>
-													updateField(
-														"heart_rate",
-														e.target.value,
-													)
-												}
-												className="h-12 pl-10 text-lg font-medium"
-												placeholder="e.g. 72"
-											/>
-											<span className="absolute right-4 top-3.5 text-slate-400 text-sm">
-												bpm
-											</span>
-										</div>
-									</div>
-								</div>
-
-								<div className="p-5 bg-blue-50/50 rounded-xl border border-blue-100">
-									<Label className="text-blue-900 mb-4 block font-semibold">
-										Blood Pressure
-									</Label>
-									<div className="flex items-center gap-4">
-										<div className="flex-1 space-y-1">
-											<Label className="text-xs text-blue-700 uppercase">
-												Systolic
-											</Label>
-											<Input
-												type="number"
-												value={
-													formData.systolic_bp || ""
-												}
-												onChange={(e) =>
-													updateField(
-														"systolic_bp",
-														e.target.value,
-													)
-												}
-												className="h-12 bg-white border-blue-200 focus-visible:ring-blue-500"
-												placeholder="120"
-											/>
-										</div>
-										<span className="text-2xl text-blue-300 font-light pt-6">
-											/
-										</span>
-										<div className="flex-1 space-y-1">
-											<Label className="text-xs text-blue-700 uppercase">
-												Diastolic
-											</Label>
-											<Input
-												type="number"
-												value={
-													formData.diastolic_bp || ""
-												}
-												onChange={(e) =>
-													updateField(
-														"diastolic_bp",
-														e.target.value,
-													)
-												}
-												className="h-12 bg-white border-blue-200 focus-visible:ring-blue-500"
-												placeholder="80"
-											/>
-										</div>
-									</div>
-								</div>
-							</div>
-						)}
-
-						{/* STEP 4: MODEL SELECTION */}
-						{step === 4 && (
-							<div className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
-								<div className="space-y-2">
-									<Label className="text-lg font-semibold">
-										Select Prediction Model
-									</Label>
-									<p className="text-sm text-slate-500">
-										Choose the machine learning algorithm to
-										process your health data.
-									</p>
-								</div>
-
-								<div className="grid grid-cols-1 gap-4">
-									{[
-										{
-											id: "forest",
-											label: "Random Forest",
-											desc: "High accuracy ensemble method using multiple decision trees. Best for complex datasets.",
-											icon: Trees,
-											color: "text-green-600",
-											bg: "bg-green-50",
-										},
-										{
-											id: "svm",
-											label: "Support Vector Machine",
-											desc: "Robust classification algorithm effective in high-dimensional spaces.",
-											icon: Network,
-											color: "text-purple-600",
-											bg: "bg-purple-50",
-										},
-										{
-											id: "logistic",
-											label: "Logistic Regression",
-											desc: "Statistical model used for binary classification. Fast and interpretable.",
-											icon: Binary,
-											color: "text-blue-600",
-											bg: "bg-blue-50",
-										},
-									].map((model) => (
-										<div
-											key={model.id}
-											onClick={() =>
-												updateField("model", model.id)
-											}
-											className={cn(
-												"cursor-pointer relative flex items-start gap-4 p-5 rounded-xl border-2 transition-all duration-300",
-												formData.model === model.id
-													? "border-slate-900 bg-slate-50 shadow-md"
-													: "border-slate-100 bg-white hover:border-slate-200 hover:shadow-sm",
-											)}
-										>
-											<div
-												className={cn(
-													"p-3 rounded-lg shrink-0",
-													model.bg,
-												)}
-											>
-												<model.icon
-													className={cn(
-														"w-6 h-6",
-														model.color,
-													)}
-												/>
+												</div>
+												<div className="space-y-2 group">
+													<Label className="group-focus-within:text-blue-600 transition-colors">
+														Height
+													</Label>
+													<div className="relative">
+														<div className="absolute left-4 top-4 bg-slate-200 rounded-md p-0.5">
+															<Ruler className="h-5 w-5 text-slate-500" />
+														</div>
+														<Input
+															type="number"
+															value={
+																formData.height ||
+																""
+															}
+															onChange={(e) =>
+																updateField(
+																	"height",
+																	e.target
+																		.value,
+																)
+															}
+															className="h-14 pl-14 text-lg bg-slate-50 border-transparent focus:bg-white focus:border-blue-500 transition-all shadow-inner"
+															placeholder="0"
+														/>
+														<span className="absolute right-4 top-4 text-slate-400 text-sm font-medium">
+															cm
+														</span>
+													</div>
+												</div>
+												<div className="space-y-2 group">
+													<Label className="group-focus-within:text-blue-600 transition-colors">
+														Weight
+													</Label>
+													<div className="relative">
+														<div className="absolute left-4 top-4 bg-slate-200 rounded-md p-0.5">
+															<Weight className="h-5 w-5 text-slate-500" />
+														</div>
+														<Input
+															type="number"
+															value={
+																formData.weight ||
+																""
+															}
+															onChange={(e) =>
+																updateField(
+																	"weight",
+																	e.target
+																		.value,
+																)
+															}
+															className="h-14 pl-14 text-lg bg-slate-50 border-transparent focus:bg-white focus:border-blue-500 transition-all shadow-inner"
+															placeholder="0"
+														/>
+														<span className="absolute right-4 top-4 text-slate-400 text-sm font-medium">
+															kg
+														</span>
+													</div>
+												</div>
 											</div>
-											<div className="flex-1">
-												<h3 className="font-semibold text-slate-900">
-													{model.label}
-												</h3>
-												<p className="text-sm text-slate-500 mt-1 leading-relaxed">
-													{model.desc}
+										</div>
+									)}
+
+									{/* STEP 2: LIFESTYLE */}
+									{step === 2 && (
+										<div className="space-y-8">
+											<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+												<div className="space-y-2 group">
+													<Label className="group-focus-within:text-purple-600 transition-colors">
+														Sleep Duration
+													</Label>
+													<div className="relative">
+														<Moon className="absolute left-4 top-4 h-6 w-6 text-purple-400" />
+														<Input
+															type="number"
+															step="0.5"
+															value={
+																formData.sleep_duration
+															}
+															onChange={(e) =>
+																updateField(
+																	"sleep_duration",
+																	e.target
+																		.value,
+																)
+															}
+															className="h-14 pl-12 text-lg focus:ring-purple-500/20 focus:border-purple-500"
+														/>
+														<span className="absolute right-4 top-4 text-slate-400 text-sm font-medium">
+															hours
+														</span>
+													</div>
+												</div>
+												<div className="space-y-2 group">
+													<Label className="group-focus-within:text-orange-600 transition-colors">
+														Physical Activity
+													</Label>
+													<div className="relative">
+														<Timer className="absolute left-4 top-4 h-6 w-6 text-orange-400" />
+														<Input
+															type="number"
+															value={
+																formData.physical_activity ||
+																""
+															}
+															onChange={(e) =>
+																updateField(
+																	"physical_activity",
+																	e.target
+																		.value,
+																)
+															}
+															className="h-14 pl-12 text-lg focus:ring-orange-500/20 focus:border-orange-500"
+														/>
+														<span className="absolute right-4 top-4 text-slate-400 text-sm font-medium">
+															mins/day
+														</span>
+													</div>
+												</div>
+												<div className="md:col-span-2 space-y-2 group">
+													<Label className="group-focus-within:text-emerald-600 transition-colors">
+														Daily Steps (Avg)
+													</Label>
+													<div className="relative">
+														<Footprints className="absolute left-4 top-4 h-6 w-6 text-emerald-400" />
+														<Input
+															type="number"
+															value={
+																formData.daily_steps ||
+																""
+															}
+															onChange={(e) =>
+																updateField(
+																	"daily_steps",
+																	e.target
+																		.value,
+																)
+															}
+															className="h-14 pl-12 text-lg focus:ring-emerald-500/20 focus:border-emerald-500"
+															placeholder="e.g. 8000"
+														/>
+													</div>
+												</div>
+											</div>
+
+											<div className="bg-slate-50 p-8 rounded-2xl border border-slate-100 space-y-6">
+												<div className="flex justify-between items-center">
+													<Label className="text-lg font-semibold text-slate-700">
+														Perceived Stress Level
+													</Label>
+													<div className="flex items-center gap-3">
+														<span className="font-bold text-2xl text-blue-600">
+															{
+																formData.stress_level
+															}
+														</span>
+														<span className="text-sm text-slate-400 uppercase font-medium tracking-wide">
+															/ 10
+														</span>
+													</div>
+												</div>
+												<div className="px-2">
+													<Slider
+														value={[
+															formData.stress_level,
+														]}
+														onValueChange={(vals) =>
+															updateField(
+																"stress_level",
+																vals[0],
+															)
+														}
+														max={10}
+														step={1}
+														className="py-4"
+													/>
+													<div className="flex justify-between text-xs font-semibold text-slate-400 uppercase tracking-wider mt-2">
+														<span>Zen Master</span>
+														<span>Average</span>
+														<span>High Stress</span>
+													</div>
+												</div>
+											</div>
+										</div>
+									)}
+
+									{/* STEP 3: HEALTH STATUS */}
+									{step === 3 && (
+										<div className="space-y-8">
+											<div className="space-y-3">
+												<Label className="text-base font-semibold text-slate-900">
+													BMI Category
+												</Label>
+												<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+													{Bmi_Category.map(
+														(item) => (
+															<motion.button
+																whileHover={{
+																	scale: 1.02,
+																}}
+																whileTap={{
+																	scale: 0.98,
+																}}
+																key={item.val}
+																onClick={() =>
+																	updateField(
+																		"bmi_category",
+																		item.val,
+																	)
+																}
+																className={cn(
+																	"text-left p-4 rounded-xl border transition-all duration-200 hover:bg-slate-50 relative outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+																	formData.bmi_category ===
+																		item.val
+																		? "border-blue-600 bg-blue-50/50 ring-1 ring-blue-600 shadow-md z-10"
+																		: "border-slate-200",
+																)}
+															>
+																<div className="font-bold text-slate-900 mb-1">
+																	{item.label}
+																</div>
+																<div className="text-xs text-slate-500 leading-tight">
+																	{item.desc}
+																</div>
+																{formData.bmi_category ===
+																	item.val && (
+																	<div className="absolute top-3 right-3 text-blue-600">
+																		<Check
+																			className="w-4 h-4"
+																			strokeWidth={
+																				3
+																			}
+																		/>
+																	</div>
+																)}
+															</motion.button>
+														),
+													)}
+												</div>
+											</div>
+
+											<div className="space-y-4">
+												<Label className="text-base font-semibold">
+													Quality of Sleep (1-10)
+												</Label>
+												<div className="flex flex-wrap gap-2 justify-between bg-slate-50 p-4 rounded-xl border border-slate-100">
+													{[
+														1, 2, 3, 4, 5, 6, 7, 8,
+														9, 10,
+													].map((num) => (
+														<motion.button
+															whileHover={{
+																scale: 1.1,
+															}}
+															whileTap={{
+																scale: 0.9,
+															}}
+															key={num}
+															onClick={() =>
+																updateField(
+																	"quality_of_sleep",
+																	num,
+																)
+															}
+															className={cn(
+																"h-10 w-10 md:h-12 md:w-12 rounded-lg border text-sm md:text-base font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-600",
+																formData.quality_of_sleep ===
+																	num
+																	? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/30"
+																	: "bg-white text-slate-600 border-slate-200 hover:border-blue-300",
+															)}
+														>
+															{num}
+														</motion.button>
+													))}
+												</div>
+											</div>
+
+											<div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+												<div className="md:col-span-2 space-y-2">
+													<Label>
+														Resting Heart Rate
+													</Label>
+													<div className="relative">
+														<Activity className="absolute left-4 top-4 h-6 w-6 text-rose-500" />
+														<Input
+															type="number"
+															value={
+																formData.heart_rate ||
+																""
+															}
+															onChange={(e) =>
+																updateField(
+																	"heart_rate",
+																	e.target
+																		.value,
+																)
+															}
+															className="h-14 pl-12 text-lg font-medium focus:border-rose-500 focus:ring-rose-500/20"
+															placeholder="e.g. 72"
+														/>
+														<span className="absolute right-4 top-4 text-slate-400 text-sm">
+															bpm
+														</span>
+													</div>
+												</div>
+
+												<div className="md:col-span-3 p-5 bg-gradient-to-br from-blue-50 to-indigo-50/50 rounded-2xl border border-blue-100 relative overflow-hidden">
+													<HeartPulse className="absolute -right-6 -bottom-6 w-32 h-32 text-blue-100/50 -rotate-12 pointer-events-none" />
+													<Label className="text-blue-900 mb-4 block font-bold">
+														Blood Pressure
+													</Label>
+													<div className="flex items-center gap-4 relative z-10">
+														<div className="flex-1 space-y-1.5">
+															<Label className="text-[10px] font-bold tracking-widest text-blue-400 uppercase">
+																Systolic
+															</Label>
+															<Input
+																type="number"
+																value={
+																	formData.systolic_bp ||
+																	""
+																}
+																onChange={(e) =>
+																	updateField(
+																		"systolic_bp",
+																		e.target
+																			.value,
+																	)
+																}
+																className="h-12 bg-white border-blue-200 focus:border-blue-500 text-center font-bold text-lg"
+																placeholder="120"
+															/>
+														</div>
+														<span className="text-3xl text-blue-300 font-light pt-6">
+															/
+														</span>
+														<div className="flex-1 space-y-1.5">
+															<Label className="text-[10px] font-bold tracking-widest text-blue-400 uppercase">
+																Diastolic
+															</Label>
+															<Input
+																type="number"
+																value={
+																	formData.diastolic_bp ||
+																	""
+																}
+																onChange={(e) =>
+																	updateField(
+																		"diastolic_bp",
+																		e.target
+																			.value,
+																	)
+																}
+																className="h-12 bg-white border-blue-200 focus:border-blue-500 text-center font-bold text-lg"
+																placeholder="80"
+															/>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									)}
+
+									{/* STEP 4: MODEL SELECTION */}
+									{step === 4 && (
+										<div className="space-y-6">
+											<div className="space-y-1">
+												<Label className="text-xl font-bold text-slate-900">
+													Select Prediction Model
+												</Label>
+												<p className="text-slate-500">
+													Choose the machine learning
+													algorithm to process your
+													health data.
 												</p>
 											</div>
-											<div
-												className={cn(
-													"w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors mt-1",
-													formData.model === model.id
-														? "border-slate-900 bg-slate-900"
-														: "border-slate-300",
-												)}
-											>
-												{formData.model ===
-													model.id && (
-													<div className="w-2 h-2 rounded-full bg-white" />
-												)}
+
+											<div className="grid grid-cols-1 gap-4 mt-4">
+												{[
+													{
+														id: "forest",
+														label: "Random Forest",
+														desc: "High accuracy ensemble method using multiple decision trees. Best for complex datasets.",
+														icon: Trees,
+														color: "text-emerald-600",
+														bg: "bg-emerald-50",
+														border: "border-emerald-200",
+														activeBorder:
+															"border-emerald-600",
+														activeBg:
+															"bg-emerald-50/50",
+													},
+													{
+														id: "svm",
+														label: "Support Vector Machine",
+														desc: "Robust classification algorithm effective in high-dimensional spaces.",
+														icon: Network,
+														color: "text-purple-600",
+														bg: "bg-purple-50",
+														border: "border-purple-200",
+														activeBorder:
+															"border-purple-600",
+														activeBg:
+															"bg-purple-50/50",
+													},
+													{
+														id: "logistic",
+														label: "Logistic Regression",
+														desc: "Statistical model used for binary classification. Fast and interpretable.",
+														icon: Binary,
+														color: "text-blue-600",
+														bg: "bg-blue-50",
+														border: "border-blue-200",
+														activeBorder:
+															"border-blue-600",
+														activeBg:
+															"bg-blue-50/50",
+													},
+												].map((model) => (
+													<motion.div
+														key={model.id}
+														whileHover={{
+															scale: 1.01,
+															y: -2,
+														}}
+														whileTap={{
+															scale: 0.99,
+														}}
+														onClick={() =>
+															updateField(
+																"model",
+																model.id,
+															)
+														}
+														className={cn(
+															"cursor-pointer relative flex items-start gap-5 p-6 rounded-2xl border-2 transition-all duration-300",
+															formData.model ===
+																model.id
+																? cn(
+																		model.activeBorder,
+																		model.activeBg,
+																		"shadow-lg",
+																	)
+																: "border-slate-100 bg-white hover:border-slate-200 hover:shadow-md",
+														)}
+													>
+														<div
+															className={cn(
+																"p-4 rounded-xl shrink-0 shadow-sm",
+																model.bg,
+															)}
+														>
+															<model.icon
+																className={cn(
+																	"w-7 h-7",
+																	model.color,
+																)}
+															/>
+														</div>
+														<div className="flex-1 py-0.5">
+															<div className="flex items-center justify-between">
+																<h3 className="font-bold text-lg text-slate-900">
+																	{
+																		model.label
+																	}
+																</h3>
+																{formData.model ===
+																	model.id && (
+																	<motion.span
+																		initial={{
+																			scale: 0,
+																		}}
+																		animate={{
+																			scale: 1,
+																		}}
+																		className={cn(
+																			"text-xs font-bold px-2 py-1 rounded-full bg-white border",
+																			model.color,
+																			model.border,
+																		)}
+																	>
+																		SELECTED
+																	</motion.span>
+																)}
+															</div>
+															<p className="text-slate-500 mt-2 leading-relaxed text-sm">
+																{model.desc}
+															</p>
+														</div>
+													</motion.div>
+												))}
 											</div>
 										</div>
-									))}
-								</div>
-							</div>
-						)}
-					</CardContent>
+									)}
+								</motion.div>
+							</AnimatePresence>
+						</CardContent>
+					</div>
 
 					{/* Footer Controls */}
-					<div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-between items-center shrink-0">
+					<div className="p-6 md:p-8 bg-white/80 backdrop-blur-md border-t border-slate-100 flex justify-between items-center shrink-0 z-10 rounded-b-3xl">
 						<Button
 							variant="ghost"
+							size="lg"
 							onClick={prevStep}
 							disabled={step === 1}
-							className="text-slate-500 hover:text-slate-900 hover:bg-slate-200/50"
+							className={cn(
+								"text-slate-500 hover:text-slate-900 hover:bg-slate-100 font-medium transition-opacity",
+								step === 1
+									? "opacity-0 pointer-events-none"
+									: "opacity-100",
+							)}
 						>
-							<ArrowLeft className="w-4 h-4 mr-2" /> Back
+							<ArrowLeft className="w-5 h-5 mr-2" /> Back
 						</Button>
 
 						{step < totalSteps ? (
-							<Button
-								onClick={nextStep}
-								className="bg-slate-900 hover:bg-slate-800 px-8 h-12 text-base transition-all hover:pr-6 group"
+							<motion.div
+								whileHover={{ scale: 1.02 }}
+								whileTap={{ scale: 0.98 }}
 							>
-								Next Section
-								<ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-							</Button>
+								<Button
+									onClick={nextStep}
+									size="lg"
+									className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-8 h-12 text-base shadow-xl shadow-slate-900/20 group"
+								>
+									Continue
+									<ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
+								</Button>
+							</motion.div>
 						) : (
-							<Button
-								className="bg-blue-600 hover:bg-blue-700 px-8 h-12 text-base shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-0.5"
-								onClick={handleSubmit}
+							<motion.div
+								whileHover={{ scale: 1.02 }}
+								whileTap={{ scale: 0.98 }}
 							>
-								Start Prediction
-								<Cpu className="w-4 h-4 ml-2" />
-							</Button>
+								<Button
+									onClick={handleSubmit}
+									size="lg"
+									className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl px-10 h-12 text-base font-bold shadow-xl shadow-blue-600/30"
+								>
+									Start Prediction
+									<Cpu className="w-5 h-5 ml-2 animate-pulse" />
+								</Button>
+							</motion.div>
 						)}
 					</div>
 				</Card>
