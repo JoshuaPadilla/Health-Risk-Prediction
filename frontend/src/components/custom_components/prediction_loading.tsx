@@ -1,13 +1,5 @@
+import { Activity, Brain, ScanLine, Stethoscope } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-	Activity,
-	Brain,
-	Database,
-	Stethoscope,
-	ScanLine,
-	CheckCircle2,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
 
 // The steps simulate a complex medical analysis process
 const LOADING_STEPS = [

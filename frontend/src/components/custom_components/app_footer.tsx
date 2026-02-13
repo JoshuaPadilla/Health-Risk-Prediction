@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Github, Twitter, Linkedin, Activity } from "lucide-react";
+import { Github, Linkedin, Twitter } from "lucide-react";
 
 export const AppFooter = () => {
 	return (

@@ -1,17 +1,15 @@
 import { Button } from "@/components/ui/button";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { motion, type Variants } from "framer-motion";
 import {
-	ShieldCheck,
-	Zap,
+	ArrowRight,
 	BarChart3,
-	FileText,
 	BrainCircuit,
 	ClipboardList,
-	ArrowRight,
-	Activity,
-	Users,
+	FileText,
+	ShieldCheck,
+	Zap,
 } from "lucide-react";
-import { motion, type Variants } from "framer-motion";
 import hero_image from "../../public/homepage-image.png";
 
 // Ideally, import your Navbar and Footer components here if they exist externally
@@ -236,7 +234,6 @@ function Home() {
 								}
 								title="AI Benchmarking"
 								description="We compare results across multiple predictive models (Random Forest, Neural Networks) to ensure highest accuracy."
-								delay={0}
 							/>
 							<FeatureCard
 								icon={
@@ -244,7 +241,6 @@ function Home() {
 								}
 								title="Secure Data"
 								description="Your health and academic data is strictly anonymized and protected according to university data privacy standards."
-								delay={0.1}
 							/>
 							<FeatureCard
 								icon={
@@ -252,7 +248,6 @@ function Home() {
 								}
 								title="Instant Results"
 								description="Receive a comprehensive risk and performance profile in seconds. Get actionable insights immediately."
-								delay={0.2}
 							/>
 						</div>
 					</div>
@@ -341,12 +336,10 @@ function FeatureCard({
 	icon,
 	title,
 	description,
-	delay,
 }: {
 	icon: React.ReactNode;
 	title: string;
 	description: string;
-	delay: number;
 }) {
 	return (
 		<motion.div

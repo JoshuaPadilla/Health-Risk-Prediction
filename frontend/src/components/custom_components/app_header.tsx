@@ -1,20 +1,14 @@
-import { useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
 	Sheet,
 	SheetContent,
-	SheetTrigger,
 	SheetHeader,
 	SheetTitle,
+	SheetTrigger,
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import {
-	NavigationMenu,
-	NavigationMenuItem,
-	NavigationMenuList,
-	navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
+import { Link } from "@tanstack/react-router";
+import { Menu } from "lucide-react";
+import { useState } from "react";
 
 const navItems = [
 	{ label: "Home", href: "/" },

@@ -1,36 +1,24 @@
-import {
-	createFileRoute,
-	Link,
-	redirect,
-	useNavigate,
-} from "@tanstack/react-router";
-import { usePredictionStore } from "@/stores/prediction_store";
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-	CardFooter,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-	ShieldCheck,
-	Download,
-	Moon,
-	Activity,
-	Scale,
-	HeartPulse,
-	RefreshCcw,
-	ArrowRight,
-	CheckCircle2,
-	AlertTriangle,
-	Info,
-	BrainCircuit,
-	Share2,
-} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { usePredictionStore } from "@/stores/prediction_store";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { motion, useSpring, useTransform, type Variants } from "framer-motion";
-import { useEffect, useState } from "react";
+import {
+	Activity,
+	AlertTriangle,
+	BrainCircuit,
+	CheckCircle2,
+	Download,
+	HeartPulse,
+	Info,
+	Moon,
+	RefreshCcw,
+	Scale,
+	Share2,
+	ShieldCheck,
+} from "lucide-react";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/predict/result")({
 	component: RouteComponent,
