@@ -32,437 +32,607 @@ import {
 	Trees,
 	Activity,
 	Sigma,
-	TrendingUp,
+	Zap,
+	BrainCircuit,
+	ArrowRight,
+	CheckCircle2,
+	Trophy, // Added Trophy for the recommendation box
 } from "lucide-react";
+import {
+	motion,
+	useSpring,
+	useMotionValue,
+	useInView,
+	type Variants,
+} from "framer-motion";
+import { useEffect, useRef, useMemo } from "react";
+
+// You can uncomment this if importing, or keep the data local for testing
+// import { ModelBenchmarks } from "@/static_data/model_benchmarks";
+
+// --- Local Data Definition (Based on your request) ---
+const ModelBenchmarks = [
+	{
+		algorithm: "Logistic Regression",
+		accuracy: 93.3,
+		precision: 93.4,
+		recall: 93.3,
+		f1_score: 93.3,
+		status: "Ready",
+	},
+	{
+		algorithm: "SVM",
+		accuracy: 96.0,
+		precision: 96.0,
+		recall: 96.0,
+		f1_score: 96.0,
+		status: "Ready",
+	},
+	{
+		algorithm: "Random Forest",
+		accuracy: 96.0,
+		precision: 96.0,
+		recall: 96.0,
+		f1_score: 96.0,
+		status: "Ready",
+	},
+];
 
 export const Route = createFileRoute("/model-benchmarking")({
 	component: ModelBenchmarking,
 });
 
-// --- Data Configuration ---
-// Matches the specific values shown in the dashboard image
-const rawData = [
-	{
-		algorithm: "Random Forest",
-		shortName: "Random Forest",
-		accuracy: 94,
-		precision: 91,
-		recall: 90,
-		f1_score: 92,
-		display_score: 92.4, // Top card specific value
-		trend: "+1.2%",
-		status: "Deployed",
-		color: "#10b981", // Emerald
-		icon: Trees,
-		desc: "Highest F1-Score Performance",
-		isBest: true,
+// --- Animation Variants ---
+const fadeInUp: Variants = {
+	hidden: { opacity: 0, y: 30 },
+	visible: {
+		opacity: 1,
+		y: 0,
+		transition: { duration: 0.6, ease: "easeOut" },
 	},
-	{
-		algorithm: "Support Vector Machine",
-		shortName: "SVM",
-		accuracy: 88,
-		precision: 89,
-		recall: 82,
-		f1_score: 88,
-		display_score: 88.1,
-		status: "Ready",
-		color: "#a855f7", // Purple
-		icon: Activity,
-		desc: "Strong precision metrics",
-		isBest: false,
-	},
-	{
-		algorithm: "Logistic Regression",
-		shortName: "Logistic Reg.",
-		accuracy: 82,
-		precision: 78,
-		recall: 80,
-		f1_score: 85,
-		display_score: 85.6,
-		status: "Ready",
-		color: "#f97316", // Orange
-		icon: Sigma,
-		desc: "Baseline performance model",
-		isBest: false,
-	},
-];
+};
 
-// Transform data for Recharts to match the specific bar grouping order
-const chartData = [
-	{
-		name: "Accuracy",
-		"Logistic Reg.": 82,
-		SVM: 88,
-		"Random Forest": 94,
+const staggerContainer: Variants = {
+	hidden: { opacity: 0 },
+	visible: {
+		opacity: 1,
+		transition: {
+			staggerChildren: 0.15,
+			delayChildren: 0.2,
+		},
 	},
-	{
-		name: "Precision",
-		"Logistic Reg.": 78,
-		SVM: 89,
-		"Random Forest": 91,
-	},
-	{
-		name: "Recall",
-		"Logistic Reg.": 80,
-		SVM: 82,
-		"Random Forest": 90,
-	},
-	{
-		name: "F1-Score",
-		"Logistic Reg.": 85,
-		SVM: 88,
-		"Random Forest": 92,
-	},
-];
+};
+
+// --- Helper: Animated Number ---
+function Counter({ value }: { value: number }) {
+	const ref = useRef<HTMLSpanElement>(null);
+	const motionValue = useMotionValue(0);
+	const springValue = useSpring(motionValue, {
+		damping: 30,
+		stiffness: 100,
+	});
+	const isInView = useInView(ref, { once: true, margin: "-10px" });
+
+	useEffect(() => {
+		if (isInView) {
+			motionValue.set(value);
+		}
+	}, [motionValue, value, isInView]);
+
+	useEffect(() => {
+		springValue.on("change", (latest) => {
+			if (ref.current) {
+				ref.current.textContent = latest.toFixed(1);
+			}
+		});
+	}, [springValue]);
+
+	return <span ref={ref} />;
+}
 
 function ModelBenchmarking() {
+	// --- Data Processing ---
+	const { processedData, chartData, bestModels, maxScore } = useMemo(() => {
+		// 1. Find the highest F1 score
+		const maxScore = Math.max(...ModelBenchmarks.map((m) => m.f1_score));
+
+		// 2. Map data to UI properties
+		const processed = ModelBenchmarks.map((item) => {
+			let uiProps = {
+				color: "#94a3b8", // Default Slate
+				bg: "bg-slate-500/10",
+				border: "border-slate-500/20",
+				icon: BrainCircuit, // Generic AI icon
+				desc: "Standard classification model",
+			};
+
+			if (item.algorithm.includes("Random Forest")) {
+				uiProps = {
+					color: "#2dd4bf", // Teal
+					bg: "bg-teal-500/10",
+					border: "border-teal-500/20",
+					icon: Trees,
+					desc: "Ensemble learning method",
+				};
+			} else if (item.algorithm.includes("SVM")) {
+				uiProps = {
+					color: "#60a5fa", // Blue
+					bg: "bg-blue-500/10",
+					border: "border-blue-500/20",
+					icon: Activity,
+					desc: "Hyperplane classification",
+				};
+			} else if (item.algorithm.includes("Logistic Regression")) {
+				uiProps = {
+					color: "#818cf8", // Indigo
+					bg: "bg-indigo-500/10",
+					border: "border-indigo-500/20",
+					icon: Sigma,
+					desc: "Probabilistic statistical model",
+				};
+			}
+
+			return {
+				...item,
+				...uiProps,
+				isBest: item.f1_score === maxScore,
+			};
+		});
+
+		// 3. Transform for Recharts
+		const charts = [
+			{ name: "Accuracy" },
+			{ name: "Precision" },
+			{ name: "Recall" },
+			{ name: "F1 Score" },
+		].map((metric) => {
+			const dataPoint: any = { name: metric.name };
+			processed.forEach((model) => {
+				const key = metric.name.toLowerCase().replace(" ", "_");
+				// @ts-ignore - dynamic access safe here
+				dataPoint[model.algorithm] = model[key] || model["accuracy"];
+			});
+			return dataPoint;
+		});
+
+		// 4. Handle Ties (Get all models that match the high score)
+		const best = processed.filter((p) => p.isBest);
+
+		return {
+			processedData: processed,
+			chartData: charts,
+			bestModels: best,
+			maxScore,
+		};
+	}, []);
+
 	return (
-		<div className="min-h-screen bg-slate-50/50 p-6 md:px-24 space-y-8 font-sans">
-			{/* --- Header --- */}
-			<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-				<div>
-					<h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
-						AI Model Benchmarking
-					</h1>
-					<p className="text-slate-500 mt-2 max-w-2xl">
-						Comparative analysis of Logistic Regression, SVM, and
-						Random Forest algorithms for student health risk
-						prediction.
-					</p>
+		<div className="min-h-screen bg-slate-50 font-sans pb-20 overflow-x-hidden">
+			{/* --- Header Section (Dark Theme) --- */}
+			<div className="relative pt-12 pb-32 md:pt-16 md:pb-48 bg-[#0F172A] overflow-hidden">
+				{/* Background Gradients */}
+				<div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-blue-900/20 rounded-full blur-[100px] pointer-events-none" />
+				<div className="absolute bottom-[0%] right-[-5%] w-[500px] h-[500px] bg-teal-900/20 rounded-full blur-[100px] pointer-events-none" />
+				<div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:40px_40px] opacity-10 pointer-events-none" />
+
+				<div className="container mx-auto px-6 md:px-12 lg:px-24 relative z-10">
+					<motion.div
+						initial="hidden"
+						animate="visible"
+						variants={staggerContainer}
+						className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6"
+					>
+						<div className="max-w-3xl">
+							<motion.div
+								variants={fadeInUp}
+								className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-500/30 bg-teal-500/10 text-teal-400 text-xs font-bold uppercase tracking-widest mb-6"
+							>
+								<span className="relative flex h-2 w-2">
+									<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+									<span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
+								</span>
+								Data Synced: Live
+							</motion.div>
+
+							<motion.h1
+								variants={fadeInUp}
+								className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1] mb-4"
+							>
+								Model{" "}
+								<span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-400">
+									Benchmarks
+								</span>
+							</motion.h1>
+							<motion.p
+								variants={fadeInUp}
+								className="text-slate-400 text-lg max-w-2xl leading-relaxed"
+							>
+								Comparing{" "}
+								<strong>
+									{processedData.length} Algorithms
+								</strong>
+								. Current Top F1-Score:{" "}
+								<span className="text-white font-bold">
+									{maxScore}%
+								</span>
+							</motion.p>
+						</div>
+
+						<motion.div variants={fadeInUp} className="flex gap-3">
+							<Button
+								variant="outline"
+								className="h-12 rounded-full border-slate-700 bg-transparent text-slate-300 hover:bg-slate-800 hover:text-white px-6"
+							>
+								<Download className="h-4 w-4 mr-2" /> Export
+							</Button>
+							<Button className="h-12 rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 px-6 font-bold shadow-[0_0_20px_rgba(20,184,166,0.3)] transition-all hover:scale-105">
+								<RefreshCw className="h-4 w-4 mr-2" /> Retrain
+							</Button>
+						</motion.div>
+					</motion.div>
 				</div>
-				<div className="flex gap-3">
-					<Button
-						variant="outline"
-						className="gap-2 bg-white border-slate-200 text-slate-700 font-medium"
-					>
-						<Download className="h-4 w-4" /> Export Report
-					</Button>
-					<Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-sm font-medium">
-						<RefreshCw className="h-4 w-4" /> Retrain Models
-					</Button>
-				</div>
 			</div>
 
-			{/* --- KPI Cards --- */}
-			<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-				{rawData.map((model) => (
-					<Card
-						key={model.algorithm}
-						className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all bg-white"
-					>
-						{/* Colored Background Blob Effect */}
-						<div
-							className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-20 -mr-16 -mt-16 pointer-events-none"
-							style={{ backgroundColor: model.color }}
-						/>
-
-						<CardContent className="p-6">
-							<div className="flex items-start justify-between mb-4">
-								<div
-									className={`p-2.5 rounded-xl`}
-									style={{
-										backgroundColor: `${model.color}15`,
-										color: model.color,
-									}}
-								>
-									<model.icon className="h-6 w-6" />
-								</div>
-								{model.isBest && (
-									<Badge
-										variant="secondary"
-										className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 font-semibold px-2.5 py-0.5 rounded-md"
-									>
-										Current Best
-									</Badge>
-								)}
-							</div>
-
-							<div>
-								<h3 className="font-medium text-slate-500 text-sm mb-1">
-									{model.algorithm}
-								</h3>
-								<div className="flex items-baseline gap-3">
-									<span className="text-4xl font-bold text-slate-900 tracking-tight">
-										{model.display_score}%
-									</span>
-									{model.trend && (
-										<span className="text-sm font-bold text-emerald-500 flex items-center">
-											<TrendingUp className="h-4 w-4 mr-1" />{" "}
-											{model.trend}
-										</span>
-									)}
-								</div>
-								<p className="text-xs text-slate-400 font-medium mt-3">
-									{model.desc}
-								</p>
-							</div>
-						</CardContent>
-					</Card>
-				))}
-			</div>
-
-			{/* --- Middle Section: Chart & Insights --- */}
-			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-				{/* Left: Chart */}
-				<Card className="lg:col-span-2 border-none shadow-sm bg-white">
-					<CardHeader>
-						<CardTitle className="text-lg font-bold text-slate-900">
-							Performance Metrics Comparison
-						</CardTitle>
-						<CardDescription>
-							Evaluating models across standard classification
-							metrics.
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="pl-0">
-						<div className="h-[350px] w-full">
-							<ResponsiveContainer width="100%" height="100%">
-								<BarChart
-									data={chartData}
-									margin={{
-										top: 20,
-										right: 30,
-										left: 0,
-										bottom: 0,
-									}}
-									barGap={8}
-								>
-									<CartesianGrid
-										strokeDasharray="3 3"
-										vertical={false}
-										stroke="#f1f5f9"
-									/>
-									<XAxis
-										dataKey="name"
-										axisLine={false}
-										tickLine={false}
-										tick={{
-											fill: "#64748b",
-											fontSize: 13,
-											fontWeight: 500,
-										}}
-										dy={12}
-									/>
-									<YAxis
-										axisLine={false}
-										tickLine={false}
-										tick={{ fill: "#94a3b8", fontSize: 12 }}
-										domain={[0, 100]}
-										tickFormatter={(value) => `${value}%`}
-										dx={-10}
-									/>
-									<Tooltip
-										cursor={{ fill: "#f8fafc" }}
-										contentStyle={{
-											borderRadius: "12px",
-											border: "none",
-											boxShadow:
-												"0 10px 15px -3px rgb(0 0 0 / 0.1)",
-											padding: "12px",
-										}}
-									/>
-									<Legend
-										iconType="circle"
-										iconSize={8}
-										wrapperStyle={{
-											paddingTop: "24px",
-											fontSize: "13px",
-											fontWeight: 500,
-											color: "#475569",
-										}}
-									/>
-									<Bar
-										name="Logistic Reg."
-										dataKey="Logistic Reg."
-										fill="#f97316"
-										radius={[4, 4, 0, 0]}
-										barSize={28}
-									/>
-									<Bar
-										name="SVM"
-										dataKey="SVM"
-										fill="#a855f7"
-										radius={[4, 4, 0, 0]}
-										barSize={28}
-									/>
-									<Bar
-										name="Random Forest"
-										dataKey="Random Forest"
-										fill="#10b981"
-										radius={[4, 4, 0, 0]}
-										barSize={28}
-									/>
-								</BarChart>
-							</ResponsiveContainer>
-						</div>
-					</CardContent>
-				</Card>
-
-				{/* Right: Insights & Recommendations */}
-				<Card className="border-none shadow-sm bg-white h-full">
-					<CardHeader>
-						<CardTitle className="text-lg font-bold text-slate-900">
-							Key Insights & Recommendations
-						</CardTitle>
-					</CardHeader>
-					<CardContent className="space-y-6">
-						{/* Random Forest Insight */}
-						<div className="flex gap-4">
-							<div className="flex-shrink-0 h-10 w-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
-								<Trees className="h-5 w-5" />
-							</div>
-							<div>
-								<p className="text-sm text-slate-600 leading-relaxed">
-									<span className="font-bold text-slate-800">
-										Random Forest
-									</span>{" "}
-									remains the top-performing model across all
-									metrics.
-								</p>
-							</div>
-						</div>
-
-						{/* SVM Insight */}
-						<div className="flex gap-4">
-							<div className="flex-shrink-0 h-10 w-10 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600">
-								<Activity className="h-5 w-5" />
-							</div>
-							<div>
-								<p className="text-sm text-slate-600 leading-relaxed">
-									<span className="font-bold text-slate-800">
-										Support Vector Machine
-									</span>{" "}
-									shows strong precision but lags in recall.
-								</p>
-							</div>
-						</div>
-
-						{/* LogReg Insight */}
-						<div className="flex gap-4">
-							<div className="flex-shrink-0 h-10 w-10 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600">
-								<Sigma className="h-5 w-5" />
-							</div>
-							<div>
-								<p className="text-sm text-slate-600 leading-relaxed">
-									<span className="font-bold text-slate-800">
-										Logistic Regression
-									</span>{" "}
-									is the baseline, suitable for quick checks.
-								</p>
-							</div>
-						</div>
-
-						{/* Recommendation Box */}
-						<div className="mt-2 p-4 rounded-xl bg-blue-50 border border-blue-100 flex gap-4 items-start">
-							<div className="flex-shrink-0 mt-0.5 h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center">
-								<div className="h-1.5 w-1.5 rounded-full bg-white" />
-							</div>
-							<p className="text-sm text-slate-700 leading-relaxed">
-								<span className="font-bold text-slate-900">
-									Recommendation:
-								</span>{" "}
-								Continue with Random Forest for current
-								production. Investigate hyperparameter tuning
-								for SVM to improve recall. Consider retraining
-								all models with larger, more diverse dataset for
-								better generalization.
-							</p>
-						</div>
-					</CardContent>
-				</Card>
-			</div>
-
-			{/* --- Bottom: Raw Performance Data Table --- */}
-			<Card className="border-none shadow-sm bg-white overflow-hidden">
-				<CardHeader className="flex flex-row items-center justify-between border-b border-slate-50 pb-4">
-					<CardTitle className="text-lg font-bold text-slate-900">
-						Raw Performance Data
-					</CardTitle>
-					<Button
-						variant="link"
-						className="text-blue-600 font-semibold h-auto p-0 hover:no-underline"
-					>
-						View Full Dataset
-					</Button>
-				</CardHeader>
-				<CardContent className="p-0">
-					<Table>
-						<TableHeader className="bg-slate-50/50">
-							<TableRow className="hover:bg-transparent border-none">
-								<TableHead className="w-[300px] text-xs font-bold uppercase tracking-wider text-slate-400 py-4 pl-6">
-									Algorithm
-								</TableHead>
-								<TableHead className="text-center text-xs font-bold uppercase tracking-wider text-slate-400 py-4">
-									Accuracy
-								</TableHead>
-								<TableHead className="text-center text-xs font-bold uppercase tracking-wider text-slate-400 py-4">
-									Precision
-								</TableHead>
-								<TableHead className="text-center text-xs font-bold uppercase tracking-wider text-slate-400 py-4">
-									Recall
-								</TableHead>
-								<TableHead className="text-center text-xs font-bold uppercase tracking-wider text-slate-400 py-4">
-									F1-Score
-								</TableHead>
-								<TableHead className="text-right text-xs font-bold uppercase tracking-wider text-slate-400 py-4 pr-6">
-									Status
-								</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{rawData.map((model) => (
-								<TableRow
+			{/* --- Main Content --- */}
+			<div className="container mx-auto px-6 md:px-12 lg:px-24 -mt-20 relative z-20">
+				<motion.div
+					variants={staggerContainer}
+					initial="hidden"
+					animate="visible"
+					className="space-y-8"
+				>
+					{/* --- KPI Cards --- */}
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+						{processedData.map((model) => {
+							console.log("Model:", model);
+							return (
+								<motion.div
 									key={model.algorithm}
-									className="hover:bg-slate-50/50 border-b border-slate-50 last:border-none"
+									variants={fadeInUp}
+									whileHover={{ y: -5 }}
 								>
-									<TableCell className="font-semibold text-slate-700 py-4 pl-6">
-										<div className="flex items-center gap-3">
-											<div
-												className="h-6 w-1.5 rounded-full"
-												style={{
-													backgroundColor:
-														model.color,
-												}}
-											/>
-											{model.algorithm}
-										</div>
-									</TableCell>
-									<TableCell className="text-center font-medium text-slate-600">
-										{model.accuracy}%
-									</TableCell>
-									<TableCell className="text-center font-medium text-slate-600">
-										{model.precision}%
-									</TableCell>
-									<TableCell className="text-center font-medium text-slate-600">
-										{model.recall}%
-									</TableCell>
-									<TableCell
-										className="text-center font-bold"
-										style={{ color: model.color }}
-									>
-										{model.f1_score}%
-									</TableCell>
-									<TableCell className="text-right pr-6">
-										<Badge
-											variant="secondary"
-											className={`
-                        font-medium px-3 py-1 rounded-full
-                        ${
-							model.status === "Deployed"
-								? "bg-emerald-100 text-emerald-700"
-								: "bg-slate-100 text-slate-500"
-						}
-                      `}
+									<Card className="relative h-full overflow-hidden border border-slate-700/50 bg-slate-800/80 backdrop-blur-md shadow-2xl rounded-3xl group">
+										<div
+											className={`absolute inset-0 bg-gradient-to-br ${
+												model.isBest
+													? "from-teal-500/10 to-transparent"
+													: "from-blue-500/5 to-transparent"
+											} pointer-events-none opacity-50`}
+										/>
+
+										<CardContent className="p-8 relative">
+											<div className="flex items-start justify-between mb-6">
+												<div
+													className={`h-12 w-12 rounded-2xl flex items-center justify-center border ${model.border} ${model.bg}`}
+												>
+													<model.icon
+														className="h-6 w-6"
+														style={{
+															color: model.color,
+														}}
+													/>
+												</div>
+												{model.isBest && (
+													<div className="flex items-center gap-1 bg-teal-500/20 border border-teal-500/30 px-3 py-1 rounded-full">
+														<Zap className="h-3 w-3 text-teal-400 fill-teal-400" />
+														<span className="text-xs font-bold text-teal-400 uppercase tracking-wider">
+															Best
+														</span>
+													</div>
+												)}
+											</div>
+
+											<div>
+												<h3 className="font-bold text-slate-400 text-xs mb-2 uppercase tracking-widest truncate">
+													{model.algorithm}
+												</h3>
+												<div className="flex items-baseline gap-2 mb-2">
+													<span className="text-5xl font-extrabold text-white tracking-tight">
+														<Counter
+															value={
+																model.accuracy
+															}
+														/>
+													</span>
+													<span className="text-xl text-slate-500 font-bold">
+														%
+													</span>
+												</div>
+												<div className="flex items-center gap-2">
+													{model.accuracy > 95 && (
+														<span className="text-xs font-bold text-teal-400 bg-teal-400/10 px-2 py-0.5 rounded-full flex items-center border border-teal-400/20">
+															<CheckCircle2 className="h-3 w-3 mr-1" />
+															High Accuracy
+														</span>
+													)}
+												</div>
+											</div>
+										</CardContent>
+									</Card>
+								</motion.div>
+							);
+						})}
+					</div>
+
+					{/* --- Charts & Insights --- */}
+					<div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-8">
+						{/* Chart */}
+						<motion.div
+							variants={fadeInUp}
+							className="lg:col-span-2"
+						>
+							<Card className="border border-slate-200 shadow-xl shadow-slate-200/50 rounded-[2rem] bg-white h-full overflow-hidden">
+								<CardHeader className="p-8 pb-2">
+									<CardTitle className="text-xl font-bold text-slate-900">
+										Metric Comparison
+									</CardTitle>
+									<CardDescription className="text-slate-500">
+										Visualizing performance across all key
+										indicators.
+									</CardDescription>
+								</CardHeader>
+								<CardContent className="p-8">
+									<div className="h-[350px] w-full">
+										<ResponsiveContainer
+											width="100%"
+											height="100%"
 										>
-											{model.status}
-										</Badge>
-									</TableCell>
-								</TableRow>
-							))}
-						</TableBody>
-					</Table>
-				</CardContent>
-			</Card>
+											<BarChart
+												data={chartData}
+												margin={{
+													top: 20,
+													right: 0,
+													left: -20,
+													bottom: 0,
+												}}
+												barGap={8}
+											>
+												<CartesianGrid
+													strokeDasharray="3 3"
+													vertical={false}
+													stroke="#f1f5f9"
+												/>
+												<XAxis
+													dataKey="name"
+													axisLine={false}
+													tickLine={false}
+													tick={{
+														fill: "#64748b",
+														fontSize: 13,
+														fontWeight: 600,
+													}}
+													dy={12}
+												/>
+												<YAxis
+													axisLine={false}
+													tickLine={false}
+													tick={{
+														fill: "#94a3b8",
+														fontSize: 12,
+													}}
+													// Scaled to 90-100 to show the difference between 93.3 and 96
+													domain={[90, 100]}
+													tickFormatter={(value) =>
+														`${value}`
+													}
+												/>
+												<Tooltip
+													cursor={{
+														fill: "#f8fafc",
+														radius: 8,
+													}}
+													contentStyle={{
+														borderRadius: "16px",
+														border: "none",
+														boxShadow:
+															"0 10px 15px -3px rgb(0 0 0 / 0.1)",
+														padding: "16px",
+														fontFamily:
+															"sans-serif",
+													}}
+												/>
+												<Legend
+													iconType="circle"
+													iconSize={8}
+													wrapperStyle={{
+														paddingTop: "30px",
+														fontSize: "13px",
+														fontWeight: 500,
+													}}
+												/>
+												{processedData.map((model) => (
+													<Bar
+														key={model.algorithm}
+														name={model.algorithm}
+														dataKey={
+															model.algorithm
+														}
+														fill={model.color}
+														radius={[4, 4, 0, 0]}
+														barSize={20}
+														animationDuration={1500}
+													/>
+												))}
+											</BarChart>
+										</ResponsiveContainer>
+									</div>
+								</CardContent>
+							</Card>
+						</motion.div>
+
+						{/* Insights */}
+						<motion.div variants={fadeInUp} className="h-full">
+							<Card className="border border-slate-200 shadow-xl shadow-slate-200/50 rounded-[2rem] bg-white h-full flex flex-col">
+								<CardHeader className="p-8 pb-4">
+									<CardTitle className="text-xl font-bold text-slate-900 flex items-center gap-2">
+										<BrainCircuit className="h-5 w-5 text-teal-500" />
+										AI Analysis
+									</CardTitle>
+								</CardHeader>
+								<CardContent className="p-8 pt-2 space-y-6 flex-1">
+									{processedData.map((item, idx) => (
+										<div
+											key={idx}
+											className="flex gap-4 group"
+										>
+											<div
+												className={`flex-shrink-0 h-10 w-10 rounded-xl ${item.bg} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
+											>
+												<item.icon
+													className="h-5 w-5"
+													style={{
+														color: item.color,
+													}}
+												/>
+											</div>
+											<div>
+												<h4
+													className="font-bold text-sm mb-1"
+													style={{
+														color: item.color,
+													}}
+												>
+													{item.algorithm}
+												</h4>
+												<p className="text-sm text-slate-600 leading-relaxed font-medium">
+													Achieved{" "}
+													<strong>
+														{item.f1_score}%
+													</strong>{" "}
+													F1 Score.{" "}
+													{item.isBest
+														? "Top performing model."
+														: "Viable alternative."}
+												</p>
+											</div>
+										</div>
+									))}
+
+									{/* Smart Recommendation Box */}
+									<div className="mt-4 p-6 rounded-2xl bg-[#0F172A] text-white shadow-lg relative overflow-hidden">
+										<div className="absolute top-0 right-0 w-20 h-20 bg-teal-500/20 blur-2xl rounded-full" />
+										<div className="relative z-10">
+											<div className="flex items-center gap-2 mb-2">
+												<Trophy className="h-4 w-4 text-yellow-400" />
+												<span className="font-bold text-xs uppercase tracking-wider text-teal-400">
+													Recommendation
+												</span>
+											</div>
+
+											{/* Dynamic Text Handling for Ties */}
+											<p className="text-sm text-slate-300 leading-relaxed">
+												Deploy{" "}
+												{bestModels.map((m, i) => (
+													<span key={m.algorithm}>
+														{i > 0 && " or "}
+														<span className="text-white font-bold">
+															{m.algorithm}
+														</span>
+													</span>
+												))}
+												.{" "}
+												{bestModels.length > 1
+													? "Both"
+													: "It"}{" "}
+												achieved optimal performance at{" "}
+												{maxScore}%.
+											</p>
+
+											<Button
+												variant="link"
+												className="text-white p-0 h-auto mt-3 text-xs font-bold hover:text-teal-400"
+											>
+												View Deployment Logs{" "}
+												<ArrowRight className="ml-1 h-3 w-3" />
+											</Button>
+										</div>
+									</div>
+								</CardContent>
+							</Card>
+						</motion.div>
+					</div>
+
+					{/* --- Bottom: Table --- */}
+					<motion.div variants={fadeInUp}>
+						<Card className="border border-slate-200 shadow-xl shadow-slate-200/50 rounded-[2rem] bg-white overflow-hidden">
+							<CardHeader className="p-8 border-b border-slate-100 flex flex-row items-center justify-between">
+								<CardTitle className="text-xl font-bold text-slate-900">
+									Detailed Metrics
+								</CardTitle>
+							</CardHeader>
+							<CardContent className="p-0">
+								<Table>
+									<TableHeader className="bg-slate-50">
+										<TableRow className="hover:bg-transparent border-none">
+											<TableHead className="w-[300px] text-xs font-bold uppercase tracking-widest text-slate-400 py-6 pl-8">
+												Algorithm
+											</TableHead>
+											<TableHead className="text-center text-xs font-bold uppercase tracking-widest text-slate-400 py-6">
+												Accuracy
+											</TableHead>
+											<TableHead className="text-center text-xs font-bold uppercase tracking-widest text-slate-400 py-6">
+												Precision
+											</TableHead>
+											<TableHead className="text-center text-xs font-bold uppercase tracking-widest text-slate-400 py-6">
+												Recall
+											</TableHead>
+											<TableHead className="text-center text-xs font-bold uppercase tracking-widest text-slate-400 py-6">
+												F1-Score
+											</TableHead>
+											<TableHead className="text-right text-xs font-bold uppercase tracking-widest text-slate-400 py-6 pr-8">
+												Status
+											</TableHead>
+										</TableRow>
+									</TableHeader>
+									<TableBody>
+										{processedData.map((model) => (
+											<TableRow
+												key={model.algorithm}
+												className="hover:bg-slate-50/80 border-b border-slate-50 last:border-none transition-colors group"
+											>
+												<TableCell className="font-bold text-slate-700 py-5 pl-8">
+													<div className="flex items-center gap-3">
+														<div
+															className="h-2 w-2 rounded-full"
+															style={{
+																backgroundColor:
+																	model.color,
+															}}
+														/>
+														{model.algorithm}
+													</div>
+												</TableCell>
+												<TableCell className="text-center font-semibold text-slate-600">
+													{model.accuracy}%
+												</TableCell>
+												<TableCell className="text-center font-semibold text-slate-600">
+													{model.precision}%
+												</TableCell>
+												<TableCell className="text-center font-semibold text-slate-600">
+													{model.recall}%
+												</TableCell>
+												<TableCell
+													className="text-center font-bold"
+													style={{
+														color: model.color,
+													}}
+												>
+													{model.f1_score}%
+												</TableCell>
+												<TableCell className="text-right pr-8">
+													<Badge className="font-bold px-3 py-1 rounded-full border-0 bg-teal-100 text-teal-700 hover:bg-teal-200">
+														{model.status}
+													</Badge>
+												</TableCell>
+											</TableRow>
+										))}
+									</TableBody>
+								</Table>
+							</CardContent>
+						</Card>
+					</motion.div>
+				</motion.div>
+			</div>
 		</div>
 	);
 }

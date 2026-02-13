@@ -1,3 +1,4 @@
+import { AppFooter } from "@/components/custom_components/app_footer";
 import AppHeader from "@/components/custom_components/app_header";
 import type { usePredictionStore } from "@/stores/prediction_store";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
@@ -12,6 +13,8 @@ const RootLayout = () => (
 		<AppHeader />
 		<hr />
 		<Outlet />
+		<AppFooter />
+
 		<TanStackRouterDevtools />
 	</>
 );

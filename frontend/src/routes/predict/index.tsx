@@ -15,6 +15,7 @@ import {
 	Trees,
 	Footprints,
 	HeartPulse,
+	Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,7 +40,7 @@ export const Route = createFileRoute("/predict/")({
 // --- Animation Variants ---
 const slideVariants = {
 	enter: (direction: number) => ({
-		x: direction > 0 ? 50 : -50,
+		x: direction > 0 ? 30 : -30,
 		opacity: 0,
 	}),
 	center: {
@@ -49,7 +50,7 @@ const slideVariants = {
 	},
 	exit: (direction: number) => ({
 		zIndex: 0,
-		x: direction < 0 ? 50 : -50,
+		x: direction < 0 ? 30 : -30,
 		opacity: 0,
 	}),
 };
@@ -136,88 +137,87 @@ function RouteComponent() {
 	};
 
 	return (
-		<div className="min-h-screen bg-slate-50/50 p-4 md:p-8 flex justify-center items-center font-sans text-slate-900 overflow-hidden">
+		<div className="min-h-screen bg-[#0B1120] font-sans text-slate-900 flex flex-col items-center py-8 px-4 md:px-8 relative overflow-hidden">
 			{isLoading && <PredictionLoading />}
 
-			<div className="w-full max-w-4xl space-y-6">
-				{/* Header & Progress */}
-				<div className="flex flex-col md:flex-row justify-between items-end md:items-center gap-4 px-1">
+			{/* Background Glows */}
+			<div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+				<div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-teal-600/20 rounded-full blur-[120px]" />
+				<div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px]" />
+			</div>
+
+			<div className="w-full max-w-5xl space-y-8 relative z-10">
+				{/* --- Header Section --- */}
+				<div className="flex flex-col md:flex-row justify-between items-end md:items-center gap-6">
 					<div>
+						<motion.div
+							initial={{ opacity: 0, y: -10 }}
+							animate={{ opacity: 1, y: 0 }}
+							className="inline-flex items-center gap-2 rounded-full bg-slate-800/50 border border-slate-700 px-3 py-1 text-xs font-bold text-teal-400 uppercase tracking-wider mb-3"
+						>
+							<Sparkles className="h-3 w-3" />
+							AI Health Assessment
+						</motion.div>
 						<motion.h1
 							initial={{ opacity: 0, y: -10 }}
 							animate={{ opacity: 1, y: 0 }}
-							className="text-3xl font-bold tracking-tight text-slate-900"
-						>
-							Health Assessment
-						</motion.h1>
-						<motion.p
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
 							transition={{ delay: 0.1 }}
-							className="text-slate-500 text-sm mt-1"
+							className="text-3xl md:text-4xl font-extrabold tracking-tight text-white"
 						>
-							Step {step} of {totalSteps}:{" "}
-							<span className="font-semibold text-blue-600">
-								{currentStepData.title}
-							</span>
-						</motion.p>
+							{currentStepData.title}
+						</motion.h1>
 					</div>
 
-					{/* Animated Progress Indicators */}
-					<div className="flex bg-white rounded-full p-1.5 shadow-sm border border-slate-200">
+					{/* Step Progress Indicators */}
+					<div className="flex bg-slate-900/50 backdrop-blur-md rounded-full p-1.5 border border-slate-700/50">
 						{Assessment_Steps.map((s) => (
 							<div key={s.id} className="relative mx-1">
 								<motion.div
-									className={`h-2.5 rounded-full transition-colors duration-500 ${
+									className={`h-2 rounded-full transition-colors duration-500 ${
 										step >= s.id
-											? "bg-blue-600"
-											: "bg-slate-100"
+											? "bg-gradient-to-r from-teal-400 to-blue-500"
+											: "bg-slate-700"
 									}`}
-									animate={{ width: step === s.id ? 48 : 12 }}
+									animate={{ width: step === s.id ? 40 : 12 }}
 								/>
 							</div>
 						))}
 					</div>
 				</div>
 
-				<Card className="overflow-hidden border-none shadow-2xl shadow-slate-200/60 relative min-h-[650px] flex flex-col bg-white rounded-3xl ring-1 ring-slate-100">
-					{/* Dynamic Hero Image Section */}
-					<div className="relative h-48 w-full overflow-hidden shrink-0">
+				{/* --- Main Content Card --- */}
+				<Card className="overflow-hidden border-none shadow-2xl shadow-black/50 relative min-h-[600px] flex flex-col bg-white rounded-3xl">
+					{/* Hero Image Banner (Compact) */}
+					<div className="relative h-32 w-full overflow-hidden shrink-0 bg-slate-900">
 						<AnimatePresence mode="wait">
 							<motion.img
 								key={currentStepData.image}
 								src={currentStepData.image}
 								alt={currentStepData.title}
-								initial={{ scale: 1.1, opacity: 0 }}
-								animate={{ scale: 1, opacity: 1 }}
+								initial={{ opacity: 0, scale: 1.1 }}
+								animate={{ opacity: 0.4, scale: 1 }}
 								exit={{ opacity: 0 }}
 								transition={{ duration: 0.5 }}
-								className="w-full h-full object-cover absolute inset-0"
+								className="w-full h-full object-cover absolute inset-0 mix-blend-overlay"
 							/>
 						</AnimatePresence>
-						<div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
+						<div className="absolute inset-0 bg-gradient-to-r from-slate-900 to-slate-900/40" />
 
-						<div className="absolute bottom-0 left-0 p-8 w-full">
-							<motion.div
-								key={step}
-								initial={{ opacity: 0, y: 10 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ delay: 0.2 }}
-							>
-								<div className="flex items-center gap-2 mb-2 text-blue-300 font-bold text-xs uppercase tracking-wider bg-slate-900/50 backdrop-blur-sm w-fit px-3 py-1 rounded-full border border-slate-700/50">
-									<currentStepData.icon className="w-3.5 h-3.5" />
-									{currentStepData.shortTitle}
+						<div className="absolute inset-0 flex items-center px-8">
+							<div className="flex items-center gap-3">
+								<div className="p-3 rounded-xl bg-white/10 backdrop-blur border border-white/10 text-teal-400">
+									<currentStepData.icon className="w-6 h-6" />
 								</div>
-								<h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
-									{currentStepData.title}
-								</h2>
-							</motion.div>
+								<div className="text-white/80 font-medium border-l border-white/20 pl-3">
+									Step {step} of {totalSteps}
+								</div>
+							</div>
 						</div>
 					</div>
 
-					{/* Scrollable Content Area */}
+					{/* Scrollable Form Area */}
 					<div className="flex-1 overflow-y-auto overflow-x-hidden relative">
-						<CardContent className="p-8">
+						<CardContent className="p-6 md:p-10">
 							<AnimatePresence custom={direction} mode="wait">
 								<motion.div
 									key={step}
@@ -238,15 +238,16 @@ function RouteComponent() {
 								>
 									{/* STEP 1: DEMOGRAPHICS */}
 									{step === 1 && (
-										<div className="space-y-8">
+										<div className="space-y-8 max-w-3xl mx-auto">
 											<div className="space-y-4">
-												<Label className="text-base font-semibold text-slate-900">
+												<Label className="text-base font-bold text-slate-800">
 													Biological Sex
 												</Label>
 												<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 													{GenderOptions.map(
 														(item) => (
 															<motion.button
+																key={item.val}
 																whileHover={{
 																	scale: 1.02,
 																	y: -2,
@@ -254,7 +255,6 @@ function RouteComponent() {
 																whileTap={{
 																	scale: 0.98,
 																}}
-																key={item.val}
 																onClick={() =>
 																	updateField(
 																		"gender",
@@ -262,11 +262,11 @@ function RouteComponent() {
 																	)
 																}
 																className={cn(
-																	"relative flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+																	"relative flex flex-col items-center justify-center p-6 rounded-2xl border transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
 																	formData.gender ===
 																		item.val
-																		? "border-blue-600 bg-blue-50 text-blue-700 shadow-md shadow-blue-100"
-																		: "border-slate-100 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50",
+																		? "border-teal-500 bg-teal-50 text-teal-700 shadow-lg shadow-teal-500/10"
+																		: "border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:bg-slate-50",
 																)}
 															>
 																<item.icon className="w-8 h-8 mb-3" />
@@ -275,17 +275,14 @@ function RouteComponent() {
 																</span>
 																{formData.gender ===
 																	item.val && (
-																	<motion.div
-																		layoutId="genderCheck"
-																		className="absolute top-3 right-3 w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-white"
-																	>
+																	<div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-teal-500 flex items-center justify-center text-white">
 																		<Check
 																			className="w-3 h-3"
 																			strokeWidth={
 																				3
 																			}
 																		/>
-																	</motion.div>
+																	</div>
 																)}
 															</motion.button>
 														),
@@ -294,8 +291,9 @@ function RouteComponent() {
 											</div>
 
 											<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+												{/* Age Input */}
 												<div className="space-y-2 group">
-													<Label className="group-focus-within:text-blue-600 transition-colors">
+													<Label className="font-semibold group-focus-within:text-teal-600 transition-colors">
 														Age
 													</Label>
 													<div className="relative">
@@ -312,7 +310,7 @@ function RouteComponent() {
 																		.value,
 																)
 															}
-															className="h-14 pl-4 text-lg bg-slate-50 border-transparent focus:bg-white focus:border-blue-500 transition-all shadow-inner"
+															className="h-14 pl-4 text-lg bg-slate-50 border-slate-200 focus:bg-white focus:border-teal-500 focus:ring-teal-500/20 transition-all"
 															placeholder="0"
 														/>
 														<span className="absolute right-4 top-4 text-slate-400 text-sm font-medium">
@@ -320,8 +318,10 @@ function RouteComponent() {
 														</span>
 													</div>
 												</div>
+
+												{/* Height Input */}
 												<div className="space-y-2 group">
-													<Label className="group-focus-within:text-blue-600 transition-colors">
+													<Label className="font-semibold group-focus-within:text-teal-600 transition-colors">
 														Height
 													</Label>
 													<div className="relative">
@@ -341,7 +341,7 @@ function RouteComponent() {
 																		.value,
 																)
 															}
-															className="h-14 pl-14 text-lg bg-slate-50 border-transparent focus:bg-white focus:border-blue-500 transition-all shadow-inner"
+															className="h-14 pl-14 text-lg bg-slate-50 border-slate-200 focus:bg-white focus:border-teal-500 focus:ring-teal-500/20 transition-all"
 															placeholder="0"
 														/>
 														<span className="absolute right-4 top-4 text-slate-400 text-sm font-medium">
@@ -349,8 +349,10 @@ function RouteComponent() {
 														</span>
 													</div>
 												</div>
+
+												{/* Weight Input */}
 												<div className="space-y-2 group">
-													<Label className="group-focus-within:text-blue-600 transition-colors">
+													<Label className="font-semibold group-focus-within:text-teal-600 transition-colors">
 														Weight
 													</Label>
 													<div className="relative">
@@ -370,7 +372,7 @@ function RouteComponent() {
 																		.value,
 																)
 															}
-															className="h-14 pl-14 text-lg bg-slate-50 border-transparent focus:bg-white focus:border-blue-500 transition-all shadow-inner"
+															className="h-14 pl-14 text-lg bg-slate-50 border-slate-200 focus:bg-white focus:border-teal-500 focus:ring-teal-500/20 transition-all"
 															placeholder="0"
 														/>
 														<span className="absolute right-4 top-4 text-slate-400 text-sm font-medium">
@@ -384,10 +386,10 @@ function RouteComponent() {
 
 									{/* STEP 2: LIFESTYLE */}
 									{step === 2 && (
-										<div className="space-y-8">
-											<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+										<div className="space-y-8 max-w-3xl mx-auto">
+											<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 												<div className="space-y-2 group">
-													<Label className="group-focus-within:text-purple-600 transition-colors">
+													<Label className="font-semibold group-focus-within:text-purple-600 transition-colors">
 														Sleep Duration
 													</Label>
 													<div className="relative">
@@ -405,15 +407,16 @@ function RouteComponent() {
 																		.value,
 																)
 															}
-															className="h-14 pl-12 text-lg focus:ring-purple-500/20 focus:border-purple-500"
+															className="h-14 pl-12 text-lg focus:ring-purple-500/20 focus:border-purple-500 bg-slate-50 border-slate-200"
 														/>
 														<span className="absolute right-4 top-4 text-slate-400 text-sm font-medium">
 															hours
 														</span>
 													</div>
 												</div>
+
 												<div className="space-y-2 group">
-													<Label className="group-focus-within:text-orange-600 transition-colors">
+													<Label className="font-semibold group-focus-within:text-orange-600 transition-colors">
 														Physical Activity
 													</Label>
 													<div className="relative">
@@ -431,15 +434,16 @@ function RouteComponent() {
 																		.value,
 																)
 															}
-															className="h-14 pl-12 text-lg focus:ring-orange-500/20 focus:border-orange-500"
+															className="h-14 pl-12 text-lg focus:ring-orange-500/20 focus:border-orange-500 bg-slate-50 border-slate-200"
 														/>
 														<span className="absolute right-4 top-4 text-slate-400 text-sm font-medium">
 															mins/day
 														</span>
 													</div>
 												</div>
+
 												<div className="md:col-span-2 space-y-2 group">
-													<Label className="group-focus-within:text-emerald-600 transition-colors">
+													<Label className="font-semibold group-focus-within:text-emerald-600 transition-colors">
 														Daily Steps (Avg)
 													</Label>
 													<div className="relative">
@@ -457,7 +461,7 @@ function RouteComponent() {
 																		.value,
 																)
 															}
-															className="h-14 pl-12 text-lg focus:ring-emerald-500/20 focus:border-emerald-500"
+															className="h-14 pl-12 text-lg focus:ring-emerald-500/20 focus:border-emerald-500 bg-slate-50 border-slate-200"
 															placeholder="e.g. 8000"
 														/>
 													</div>
@@ -466,16 +470,16 @@ function RouteComponent() {
 
 											<div className="bg-slate-50 p-8 rounded-2xl border border-slate-100 space-y-6">
 												<div className="flex justify-between items-center">
-													<Label className="text-lg font-semibold text-slate-700">
+													<Label className="text-lg font-bold text-slate-700">
 														Perceived Stress Level
 													</Label>
 													<div className="flex items-center gap-3">
-														<span className="font-bold text-2xl text-blue-600">
+														<span className="font-bold text-3xl text-teal-600">
 															{
 																formData.stress_level
 															}
 														</span>
-														<span className="text-sm text-slate-400 uppercase font-medium tracking-wide">
+														<span className="text-sm text-slate-400 font-bold uppercase">
 															/ 10
 														</span>
 													</div>
@@ -495,10 +499,10 @@ function RouteComponent() {
 														step={1}
 														className="py-4"
 													/>
-													<div className="flex justify-between text-xs font-semibold text-slate-400 uppercase tracking-wider mt-2">
-														<span>Zen Master</span>
-														<span>Average</span>
-														<span>High Stress</span>
+													<div className="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-wider mt-2">
+														<span>Low</span>
+														<span>Moderate</span>
+														<span>High</span>
 													</div>
 												</div>
 											</div>
@@ -507,22 +511,22 @@ function RouteComponent() {
 
 									{/* STEP 3: HEALTH STATUS */}
 									{step === 3 && (
-										<div className="space-y-8">
+										<div className="space-y-8 max-w-3xl mx-auto">
 											<div className="space-y-3">
-												<Label className="text-base font-semibold text-slate-900">
+												<Label className="text-base font-bold text-slate-900">
 													BMI Category
 												</Label>
 												<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
 													{Bmi_Category.map(
 														(item) => (
 															<motion.button
+																key={item.val}
 																whileHover={{
 																	scale: 1.02,
 																}}
 																whileTap={{
 																	scale: 0.98,
 																}}
-																key={item.val}
 																onClick={() =>
 																	updateField(
 																		"bmi_category",
@@ -530,11 +534,11 @@ function RouteComponent() {
 																	)
 																}
 																className={cn(
-																	"text-left p-4 rounded-xl border transition-all duration-200 hover:bg-slate-50 relative outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+																	"text-left p-4 rounded-xl border transition-all duration-200 hover:bg-slate-50 relative outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
 																	formData.bmi_category ===
 																		item.val
-																		? "border-blue-600 bg-blue-50/50 ring-1 ring-blue-600 shadow-md z-10"
-																		: "border-slate-200",
+																		? "border-teal-500 bg-teal-50/50 ring-1 ring-teal-500 shadow-md z-10"
+																		: "border-slate-200 bg-white",
 																)}
 															>
 																<div className="font-bold text-slate-900 mb-1">
@@ -545,7 +549,7 @@ function RouteComponent() {
 																</div>
 																{formData.bmi_category ===
 																	item.val && (
-																	<div className="absolute top-3 right-3 text-blue-600">
+																	<div className="absolute top-3 right-3 text-teal-600">
 																		<Check
 																			className="w-4 h-4"
 																			strokeWidth={
@@ -561,7 +565,7 @@ function RouteComponent() {
 											</div>
 
 											<div className="space-y-4">
-												<Label className="text-base font-semibold">
+												<Label className="text-base font-bold">
 													Quality of Sleep (1-10)
 												</Label>
 												<div className="flex flex-wrap gap-2 justify-between bg-slate-50 p-4 rounded-xl border border-slate-100">
@@ -570,13 +574,13 @@ function RouteComponent() {
 														9, 10,
 													].map((num) => (
 														<motion.button
+															key={num}
 															whileHover={{
 																scale: 1.1,
 															}}
 															whileTap={{
 																scale: 0.9,
 															}}
-															key={num}
 															onClick={() =>
 																updateField(
 																	"quality_of_sleep",
@@ -599,7 +603,7 @@ function RouteComponent() {
 
 											<div className="grid grid-cols-1 md:grid-cols-5 gap-6">
 												<div className="md:col-span-2 space-y-2">
-													<Label>
+													<Label className="font-bold">
 														Resting Heart Rate
 													</Label>
 													<div className="relative">
@@ -617,17 +621,17 @@ function RouteComponent() {
 																		.value,
 																)
 															}
-															className="h-14 pl-12 text-lg font-medium focus:border-rose-500 focus:ring-rose-500/20"
+															className="h-14 pl-12 text-lg font-bold focus:border-rose-500 focus:ring-rose-500/20 bg-slate-50 border-slate-200"
 															placeholder="e.g. 72"
 														/>
-														<span className="absolute right-4 top-4 text-slate-400 text-sm">
+														<span className="absolute right-4 top-4 text-slate-400 text-sm font-medium">
 															bpm
 														</span>
 													</div>
 												</div>
 
-												<div className="md:col-span-3 p-5 bg-gradient-to-br from-blue-50 to-indigo-50/50 rounded-2xl border border-blue-100 relative overflow-hidden">
-													<HeartPulse className="absolute -right-6 -bottom-6 w-32 h-32 text-blue-100/50 -rotate-12 pointer-events-none" />
+												<div className="md:col-span-3 p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 relative overflow-hidden">
+													<HeartPulse className="absolute -right-6 -bottom-6 w-32 h-32 text-blue-200/50 -rotate-12 pointer-events-none" />
 													<Label className="text-blue-900 mb-4 block font-bold">
 														Blood Pressure
 													</Label>
@@ -685,11 +689,11 @@ function RouteComponent() {
 
 									{/* STEP 4: MODEL SELECTION */}
 									{step === 4 && (
-										<div className="space-y-6">
-											<div className="space-y-1">
-												<Label className="text-xl font-bold text-slate-900">
+										<div className="space-y-6 max-w-3xl mx-auto">
+											<div className="text-center md:text-left">
+												<h3 className="text-xl font-bold text-slate-900">
 													Select Prediction Model
-												</Label>
+												</h3>
 												<p className="text-slate-500">
 													Choose the machine learning
 													algorithm to process your
@@ -708,7 +712,7 @@ function RouteComponent() {
 														bg: "bg-emerald-50",
 														border: "border-emerald-200",
 														activeBorder:
-															"border-emerald-600",
+															"border-emerald-500",
 														activeBg:
 															"bg-emerald-50/50",
 													},
@@ -721,7 +725,7 @@ function RouteComponent() {
 														bg: "bg-purple-50",
 														border: "border-purple-200",
 														activeBorder:
-															"border-purple-600",
+															"border-purple-500",
 														activeBg:
 															"bg-purple-50/50",
 													},
@@ -734,7 +738,7 @@ function RouteComponent() {
 														bg: "bg-blue-50",
 														border: "border-blue-200",
 														activeBorder:
-															"border-blue-600",
+															"border-blue-500",
 														activeBg:
 															"bg-blue-50/50",
 													},
@@ -820,14 +824,14 @@ function RouteComponent() {
 					</div>
 
 					{/* Footer Controls */}
-					<div className="p-6 md:p-8 bg-white/80 backdrop-blur-md border-t border-slate-100 flex justify-between items-center shrink-0 z-10 rounded-b-3xl">
+					<div className="p-6 md:p-8 bg-slate-50 border-t border-slate-100 flex justify-between items-center shrink-0 z-10 rounded-b-3xl">
 						<Button
 							variant="ghost"
 							size="lg"
 							onClick={prevStep}
 							disabled={step === 1}
 							className={cn(
-								"text-slate-500 hover:text-slate-900 hover:bg-slate-100 font-medium transition-opacity",
+								"text-slate-500 hover:text-slate-900 hover:bg-slate-200 font-bold transition-opacity",
 								step === 1
 									? "opacity-0 pointer-events-none"
 									: "opacity-100",
@@ -844,7 +848,7 @@ function RouteComponent() {
 								<Button
 									onClick={nextStep}
 									size="lg"
-									className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-8 h-12 text-base shadow-xl shadow-slate-900/20 group"
+									className="bg-slate-900 hover:bg-slate-800 text-white rounded-full px-8 h-12 text-base font-bold shadow-lg shadow-slate-900/20 group"
 								>
 									Continue
 									<ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
@@ -858,7 +862,7 @@ function RouteComponent() {
 								<Button
 									onClick={handleSubmit}
 									size="lg"
-									className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl px-10 h-12 text-base font-bold shadow-xl shadow-blue-600/30"
+									className="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white rounded-full px-10 h-12 text-base font-bold shadow-lg shadow-blue-500/30"
 								>
 									Start Prediction
 									<Cpu className="w-5 h-5 ml-2 animate-pulse" />

@@ -27,44 +27,44 @@ export default function AppHeader() {
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (
-		<header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 px-8">
-			<div className="container flex h-16 items-center justify-between">
+		// Changed to dark background to match the Hero section
+		<header className="sticky top-0 z-50 w-full border-b border-slate-800 bg-[#0B1120]/90 backdrop-blur-md px-4 md:px-8">
+			<div className="container mx-auto flex h-20 items-center justify-between">
 				{/* --- LEFT SIDE: LOGO --- */}
 				<Link
 					to="/"
-					className="flex items-center gap-2 transition-opacity hover:opacity-90"
+					className="flex items-center gap-3 transition-opacity hover:opacity-90"
 				>
-					<img
-						src="/BioMetric_logo.png"
-						alt="BioMetric Logo"
-						className="h-8 w-8 object-contain"
-					/>
-					<span className="font-heading text-xl font-bold tracking-tight text-foreground">
+					{/* Assuming logo has a transparent bg. If not, you might need a white version */}
+					<div className="bg-gradient-to-br from-teal-400 to-blue-600 p-1.5 rounded-lg">
+						<img
+							src="/BioMetric_logo.png"
+							alt="BioMetric Logo"
+							className="h-6 w-6 object-contain brightness-0 invert"
+						/>
+					</div>
+					<span className="font-heading text-xl font-bold tracking-tight text-white">
 						BioMetric
 					</span>
 				</Link>
 
 				{/* --- RIGHT SIDE: DESKTOP NAV --- */}
-				<nav className="hidden md:flex">
-					<NavigationMenu>
-						<NavigationMenuList>
-							{navItems.map((item) => (
-								<NavigationMenuItem key={item.label}>
-									<Link
-										to={item.href}
-										className={navigationMenuTriggerStyle()}
-										// TanStack Router handles active class automatically via activeProps
-										activeProps={{
-											className:
-												"bg-accent text-accent-foreground",
-										}}
-									>
-										{item.label}
-									</Link>
-								</NavigationMenuItem>
-							))}
-						</NavigationMenuList>
-					</NavigationMenu>
+				<nav className="hidden md:flex items-center gap-6">
+					<div className="flex items-center gap-1">
+						{navItems.map((item) => (
+							<Link
+								key={item.label}
+								to={item.href}
+								className="px-4 py-2 text-sm font-medium text-slate-300 transition-colors hover:text-white hover:bg-white/10 rounded-md"
+								activeProps={{
+									className:
+										"text-white bg-white/10 font-semibold",
+								}}
+							>
+								{item.label}
+							</Link>
+						))}
+					</div>
 				</nav>
 
 				{/* --- RIGHT SIDE: MOBILE TOGGLE --- */}
@@ -74,7 +74,7 @@ export default function AppHeader() {
 							<Button
 								variant="ghost"
 								size="icon"
-								className="-mr-2"
+								className="text-slate-300 hover:text-white hover:bg-white/10"
 								aria-label="Toggle Menu"
 							>
 								<Menu className="h-6 w-6" />
@@ -82,15 +82,10 @@ export default function AppHeader() {
 						</SheetTrigger>
 						<SheetContent
 							side="right"
-							className="w-[250px] sm:w-[300px]"
+							className="w-[300px] border-slate-800 bg-[#0B1120] text-slate-100"
 						>
 							<SheetHeader>
-								<SheetTitle className="text-left font-heading font-bold flex items-center gap-2">
-									<img
-										src="/BioMetric_logo.png"
-										alt="Logo"
-										className="h-6 w-6"
-									/>
+								<SheetTitle className="text-left font-heading font-bold flex items-center gap-2 text-white">
 									BioMetric
 								</SheetTitle>
 							</SheetHeader>
@@ -99,11 +94,12 @@ export default function AppHeader() {
 									<Link
 										key={item.label}
 										to={item.href}
-										className="text-lg font-medium text-foreground/80 hover:text-primary transition-colors data-[status=active]:text-primary data-[status=active]:font-semibold"
+										className="text-lg font-medium text-slate-400 hover:text-teal-400 transition-colors"
 										activeProps={{
-											"data-status": "active", // Alternative way to handle active state
+											className:
+												"text-teal-400 font-semibold",
 										}}
-										onClick={() => setIsOpen(false)} // Closes menu on click
+										onClick={() => setIsOpen(false)}
 									>
 										{item.label}
 									</Link>
