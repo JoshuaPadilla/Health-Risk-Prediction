@@ -1,6 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { PredictionService } from './prediction.service';
 import { PredictionFormDto } from 'src/dto/prediction_form_dto';
+import { PredictionService } from './prediction.service';
 
 @Controller('prediction')
 export class PredictionController {

@@ -5,7 +5,8 @@ import pandas as pd
 import numpy as np
 
 # Initialize the App (Like 'const app = express()')
-app = FastAPI()
+app = FastAPI(root_path="/api/fast")
+
 
 # --- 1. Load Your "Brains" ---
 # We load all 3 models + the Scaler into memory when the server starts.
