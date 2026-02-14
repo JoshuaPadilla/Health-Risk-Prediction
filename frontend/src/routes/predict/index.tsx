@@ -1,37 +1,37 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import {
-	ArrowLeft,
-	ArrowRight,
-	Activity,
-	Moon,
-	Check,
-	Ruler,
-	Weight,
-	Timer,
-	Cpu,
-	Network,
-	Binary,
-	Trees,
-	Footprints,
-	HeartPulse,
-	Sparkles,
-} from "lucide-react";
+import { PredictionLoading } from "@/components/custom_components/prediction_loading";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
-import { cn } from "@/lib/utils";
-import { GenderOptions } from "@/static_data/gender_options";
-import { Bmi_Category } from "@/static_data/bmi_category_options";
-import { Assessment_Steps } from "@/static_data/assessment_steps";
-import { toast } from "sonner";
 import { validatePredictionForm } from "@/helpers/form_validatation";
+import { cn } from "@/lib/utils";
+import { Assessment_Steps } from "@/static_data/assessment_steps";
+import { Bmi_Category } from "@/static_data/bmi_category_options";
+import { GenderOptions } from "@/static_data/gender_options";
 import { usePredictionStore } from "@/stores/prediction_store";
 import type { PredictionForm } from "@/types/prediction_form";
-import { PredictionLoading } from "@/components/custom_components/prediction_loading";
-import { motion, AnimatePresence } from "framer-motion";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+	Activity,
+	ArrowLeft,
+	ArrowRight,
+	Binary,
+	Check,
+	Cpu,
+	Footprints,
+	HeartPulse,
+	Moon,
+	Network,
+	Ruler,
+	Sparkles,
+	Timer,
+	Trees,
+	Weight,
+} from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/predict/")({
 	component: RouteComponent,
@@ -64,18 +64,18 @@ function RouteComponent() {
 
 	const [formData, setFormData] = useState<PredictionForm>({
 		gender: 0,
-		age: 24,
-		height: 168,
-		weight: 82,
-		sleep_duration: 5,
-		physical_activity: 100,
-		daily_steps: 8000,
-		stress_level: 8,
-		quality_of_sleep: 4,
-		bmi_category: 1,
-		heart_rate: 75,
-		systolic_bp: 120,
-		diastolic_bp: 80,
+		age: 0,
+		height: 0,
+		weight: 0,
+		sleep_duration: 0,
+		physical_activity: 0,
+		daily_steps: 0,
+		stress_level: 0,
+		quality_of_sleep: 0,
+		bmi_category: 0,
+		heart_rate: 0,
+		systolic_bp: 0,
+		diastolic_bp: 0,
 		model: "forest",
 	});
 
