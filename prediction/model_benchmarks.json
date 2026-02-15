@@ -5,7 +5,17 @@
         "precision": 93.4,
         "recall": 93.3,
         "f1_score": 93.3,
-        "status": "Ready"
+        "status": "Ready",
+        "confusion_matrix": [
+            [
+                40,
+                3
+            ],
+            [
+                2,
+                30
+            ]
+        ]
     },
     {
         "algorithm": "SVM",
@@ -13,7 +23,17 @@
         "precision": 96.0,
         "recall": 96.0,
         "f1_score": 96.0,
-        "status": "Ready"
+        "status": "Ready",
+        "confusion_matrix": [
+            [
+                42,
+                1
+            ],
+            [
+                2,
+                30
+            ]
+        ]
     },
     {
         "algorithm": "Random Forest",
@@ -21,6 +41,16 @@
         "precision": 96.0,
         "recall": 96.0,
         "f1_score": 96.0,
-        "status": "Ready"
+        "status": "Ready",
+        "confusion_matrix": [
+            [
+                42,
+                1
+            ],
+            [
+                2,
+                30
+            ]
+        ]
     }
 ]

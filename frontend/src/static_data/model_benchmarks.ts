@@ -6,6 +6,10 @@ export const ModelBenchmarks = [
 		recall: 93.3,
 		f1_score: 93.3,
 		status: "Ready",
+		confusion_matrix: [
+			[40, 3],
+			[2, 30],
+		],
 	},
 	{
 		algorithm: "SVM",
@@ -14,6 +18,10 @@ export const ModelBenchmarks = [
 		recall: 96.0,
 		f1_score: 96.0,
 		status: "Ready",
+		confusion_matrix: [
+			[42, 1],
+			[2, 30],
+		],
 	},
 	{
 		algorithm: "Random Forest",
@@ -22,5 +30,9 @@ export const ModelBenchmarks = [
 		recall: 96.0,
 		f1_score: 96.0,
 		status: "Ready",
+		confusion_matrix: [
+			[42, 1],
+			[2, 30],
+		],
 	},
 ];

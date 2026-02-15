@@ -1,23 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
-import {
-	BarChart,
-	Bar,
-	XAxis,
-	YAxis,
-	CartesianGrid,
-	Tooltip,
-	Legend,
-	ResponsiveContainer,
-} from "recharts";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
+	CardDescription,
 	CardHeader,
 	CardTitle,
-	CardDescription,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
 	Table,
 	TableBody,
@@ -26,31 +15,40 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import {
-	Download,
-	RefreshCw,
-	Trees,
-	Activity,
-	Sigma,
-	Zap,
-	BrainCircuit,
-	ArrowRight,
-	CheckCircle2,
-	Trophy, // Added Trophy for the recommendation box
-} from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
 import {
 	motion,
-	useSpring,
-	useMotionValue,
 	useInView,
+	useMotionValue,
+	useSpring,
 	type Variants,
 } from "framer-motion";
-import { useEffect, useRef, useMemo } from "react";
+import {
+	Activity,
+	ArrowRight,
+	BrainCircuit,
+	CheckCircle2,
+	Download,
+	Grid2X2,
+	RefreshCw,
+	Sigma,
+	Trees,
+	Trophy,
+	Zap,
+} from "lucide-react";
+import { useEffect, useMemo, useRef } from "react";
+import {
+	Bar,
+	BarChart,
+	CartesianGrid,
+	Legend,
+	ResponsiveContainer,
+	Tooltip,
+	XAxis,
+	YAxis,
+} from "recharts";
 
-// You can uncomment this if importing, or keep the data local for testing
-// import { ModelBenchmarks } from "@/static_data/model_benchmarks";
-
-// --- Local Data Definition (Based on your request) ---
+// --- Local Data Definition ---
 const ModelBenchmarks = [
 	{
 		algorithm: "Logistic Regression",
@@ -59,6 +57,10 @@ const ModelBenchmarks = [
 		recall: 93.3,
 		f1_score: 93.3,
 		status: "Ready",
+		confusion_matrix: [
+			[40, 3],
+			[2, 30],
+		],
 	},
 	{
 		algorithm: "SVM",
@@ -67,6 +69,10 @@ const ModelBenchmarks = [
 		recall: 96.0,
 		f1_score: 96.0,
 		status: "Ready",
+		confusion_matrix: [
+			[42, 1],
+			[2, 30],
+		],
 	},
 	{
 		algorithm: "Random Forest",
@@ -75,6 +81,10 @@ const ModelBenchmarks = [
 		recall: 96.0,
 		f1_score: 96.0,
 		status: "Ready",
+		confusion_matrix: [
+			[42, 1],
+			[2, 30],
+		],
 	},
 ];
 
@@ -130,19 +140,91 @@ function Counter({ value }: { value: number }) {
 	return <span ref={ref} />;
 }
 
+// --- Helper: Confusion Matrix Component ---
+const ConfusionMatrixViz = ({
+	matrix,
+	color,
+}: {
+	matrix: number[][];
+	color: string;
+}) => {
+	const flat = matrix.flat();
+	const maxVal = Math.max(...flat);
+
+	const cells = [
+		{ label: "TP", val: matrix[0][0], type: "True Pos" },
+		{ label: "FP", val: matrix[0][1], type: "False Pos" },
+		{ label: "FN", val: matrix[1][0], type: "False Neg" },
+		{ label: "TN", val: matrix[1][1], type: "True Neg" },
+	];
+
+	return (
+		<div className="flex flex-col items-center p-2">
+			<div className="flex gap-2">
+				{/* Y-Axis Label: Using vertical writing mode for better alignment */}
+				<div className="flex items-center justify-center text-[10px] font-bold text-slate-400 uppercase tracking-widest [writing-mode:vertical-rl] rotate-180">
+					Actual Class
+				</div>
+
+				<div className="flex flex-col gap-2">
+					{/* X-Axis Label */}
+					<div className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+						Predicted Class
+					</div>
+
+					{/* Matrix Grid */}
+					<div className="grid grid-cols-2 gap-1.5 p-1.5 bg-slate-50 rounded-xl border border-slate-200">
+						{cells.map((cell, i) => {
+							const intensity = cell.val / maxVal;
+							// Diagonal (TP/TN) get main color, Errors (FP/FN) get Red
+							const isDiagonal = i === 0 || i === 3;
+							const cellColor = isDiagonal ? color : "#ef4444";
+
+							return (
+								<div
+									key={i}
+									className="h-14 w-16 rounded-lg flex flex-col items-center justify-center relative overflow-hidden transition-all hover:scale-105"
+									style={{
+										backgroundColor: isDiagonal
+											? `${color}15`
+											: "#ef444410",
+									}}
+								>
+									{/* Heatmap background opacity */}
+									<div
+										className="absolute inset-0"
+										style={{
+											backgroundColor: cellColor,
+											opacity: 0.1 + intensity * 0.4,
+										}}
+									/>
+
+									<span className="text-lg font-bold text-slate-700 relative z-10">
+										{cell.val}
+									</span>
+									<span className="text-[9px] font-medium text-slate-500 uppercase relative z-10 opacity-70">
+										{cell.label}
+									</span>
+								</div>
+							);
+						})}
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
+
 function ModelBenchmarking() {
-	// --- Data Processing ---
 	const { processedData, chartData, bestModels, maxScore } = useMemo(() => {
-		// 1. Find the highest F1 score
 		const maxScore = Math.max(...ModelBenchmarks.map((m) => m.f1_score));
 
-		// 2. Map data to UI properties
 		const processed = ModelBenchmarks.map((item) => {
 			let uiProps = {
 				color: "#94a3b8", // Default Slate
 				bg: "bg-slate-500/10",
 				border: "border-slate-500/20",
-				icon: BrainCircuit, // Generic AI icon
+				icon: BrainCircuit,
 				desc: "Standard classification model",
 			};
 
@@ -179,23 +261,27 @@ function ModelBenchmarking() {
 			};
 		});
 
-		// 3. Transform for Recharts
 		const charts = [
 			{ name: "Accuracy" },
 			{ name: "Precision" },
 			{ name: "Recall" },
 			{ name: "F1 Score" },
 		].map((metric) => {
-			const dataPoint: any = { name: metric.name };
+			// Type safe accumulator
+			const dataPoint: Record<string, any> = { name: metric.name };
 			processed.forEach((model) => {
-				const key = metric.name.toLowerCase().replace(" ", "_");
-				// @ts-ignore - dynamic access safe here
-				dataPoint[model.algorithm] = model[key] || model["accuracy"];
+				// Safe key access logic
+				const key = metric.name
+					.toLowerCase()
+					.replace(" ", "_") as keyof typeof model;
+				// Ensure we only grab number values for the chart
+				const value = model[key];
+				dataPoint[model.algorithm] =
+					typeof value === "number" ? value : 0;
 			});
 			return dataPoint;
 		});
 
-		// 4. Handle Ties (Get all models that match the high score)
 		const best = processed.filter((p) => p.isBest);
 
 		return {
@@ -220,7 +306,7 @@ function ModelBenchmarking() {
 						initial="hidden"
 						animate="visible"
 						variants={staggerContainer}
-						className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6"
+						className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8"
 					>
 						<div className="max-w-3xl">
 							<motion.div
@@ -236,7 +322,7 @@ function ModelBenchmarking() {
 
 							<motion.h1
 								variants={fadeInUp}
-								className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1] mb-4"
+								className="text-4xl md:text-6xl font-bold tracking-tight text-white leading-[1.1] mb-4"
 							>
 								Model{" "}
 								<span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-400">
@@ -248,7 +334,7 @@ function ModelBenchmarking() {
 								className="text-slate-400 text-lg max-w-2xl leading-relaxed"
 							>
 								Comparing{" "}
-								<strong>
+								<strong className="text-slate-200">
 									{processedData.length} Algorithms
 								</strong>
 								. Current Top F1-Score:{" "}
@@ -261,7 +347,7 @@ function ModelBenchmarking() {
 						<motion.div variants={fadeInUp} className="flex gap-3">
 							<Button
 								variant="outline"
-								className="h-12 rounded-full border-slate-700 bg-transparent text-slate-300 hover:bg-slate-800 hover:text-white px-6"
+								className="h-12 rounded-full border-slate-700 bg-transparent text-slate-300 hover:bg-slate-800 hover:text-white px-6 transition-all"
 							>
 								<Download className="h-4 w-4 mr-2" /> Export
 							</Button>
@@ -274,7 +360,7 @@ function ModelBenchmarking() {
 			</div>
 
 			{/* --- Main Content --- */}
-			<div className="container mx-auto px-6 md:px-12 lg:px-24 -mt-20 relative z-20">
+			<div className="container mx-auto px-4 md:px-12 lg:px-24 -mt-20 relative z-20">
 				<motion.div
 					variants={staggerContainer}
 					initial="hidden"
@@ -284,20 +370,20 @@ function ModelBenchmarking() {
 					{/* --- KPI Cards --- */}
 					<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 						{processedData.map((model) => {
-							console.log("Model:", model);
 							return (
 								<motion.div
 									key={model.algorithm}
 									variants={fadeInUp}
 									whileHover={{ y: -5 }}
 								>
-									<Card className="relative h-full overflow-hidden border border-slate-700/50 bg-slate-800/80 backdrop-blur-md shadow-2xl rounded-3xl group">
+									{/* Fixed: Used a solid dark color (#1e293b) to ensure text is readable even if it overlaps the white background area */}
+									<Card className="relative h-full overflow-hidden border border-slate-700 bg-[#1e293b] shadow-2xl rounded-3xl group">
 										<div
 											className={`absolute inset-0 bg-gradient-to-br ${
 												model.isBest
 													? "from-teal-500/10 to-transparent"
 													: "from-blue-500/5 to-transparent"
-											} pointer-events-none opacity-50`}
+											} pointer-events-none`}
 										/>
 
 										<CardContent className="p-8 relative">
@@ -355,11 +441,11 @@ function ModelBenchmarking() {
 					</div>
 
 					{/* --- Charts & Insights --- */}
-					<div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-8">
+					<div className="grid grid-cols-1 xl:grid-cols-3 gap-8 pt-8">
 						{/* Chart */}
 						<motion.div
 							variants={fadeInUp}
-							className="lg:col-span-2"
+							className="xl:col-span-2"
 						>
 							<Card className="border border-slate-200 shadow-xl shadow-slate-200/50 rounded-[2rem] bg-white h-full overflow-hidden">
 								<CardHeader className="p-8 pb-2">
@@ -371,7 +457,7 @@ function ModelBenchmarking() {
 										indicators.
 									</CardDescription>
 								</CardHeader>
-								<CardContent className="p-8">
+								<CardContent className="p-4 md:p-8">
 									<div className="h-[350px] w-full">
 										<ResponsiveContainer
 											width="100%"
@@ -410,7 +496,6 @@ function ModelBenchmarking() {
 														fill: "#94a3b8",
 														fontSize: 12,
 													}}
-													// Scaled to 90-100 to show the difference between 93.3 and 96
 													domain={[90, 100]}
 													tickFormatter={(value) =>
 														`${value}`
@@ -422,11 +507,11 @@ function ModelBenchmarking() {
 														radius: 8,
 													}}
 													contentStyle={{
-														borderRadius: "16px",
-														border: "none",
+														borderRadius: "12px",
+														border: "1px solid #e2e8f0",
 														boxShadow:
 															"0 10px 15px -3px rgb(0 0 0 / 0.1)",
-														padding: "16px",
+														padding: "12px",
 														fontFamily:
 															"sans-serif",
 													}}
@@ -508,7 +593,7 @@ function ModelBenchmarking() {
 										</div>
 									))}
 
-									{/* Smart Recommendation Box */}
+									{/* Recommendation Box */}
 									<div className="mt-4 p-6 rounded-2xl bg-[#0F172A] text-white shadow-lg relative overflow-hidden">
 										<div className="absolute top-0 right-0 w-20 h-20 bg-teal-500/20 blur-2xl rounded-full" />
 										<div className="relative z-10">
@@ -518,8 +603,6 @@ function ModelBenchmarking() {
 													Recommendation
 												</span>
 											</div>
-
-											{/* Dynamic Text Handling for Ties */}
 											<p className="text-sm text-slate-300 leading-relaxed">
 												Deploy{" "}
 												{bestModels.map((m, i) => (
@@ -537,7 +620,6 @@ function ModelBenchmarking() {
 												achieved optimal performance at{" "}
 												{maxScore}%.
 											</p>
-
 											<Button
 												variant="link"
 												className="text-white p-0 h-auto mt-3 text-xs font-bold hover:text-teal-400"
@@ -552,6 +634,97 @@ function ModelBenchmarking() {
 						</motion.div>
 					</div>
 
+					{/* --- NEW SECTION: Model Diagnostics (Confusion Matrices) --- */}
+					<motion.div variants={fadeInUp} className="pt-4">
+						<Card className="border border-slate-200 shadow-xl shadow-slate-200/50 rounded-[2rem] bg-white overflow-hidden">
+							<CardHeader className="p-8 border-b border-slate-100">
+								<div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+									<div className="flex items-center gap-3">
+										<div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
+											<Grid2X2 className="h-5 w-5 text-slate-500" />
+										</div>
+										<div>
+											<CardTitle className="text-xl font-bold text-slate-900">
+												Model Diagnostics
+											</CardTitle>
+											<CardDescription>
+												Confusion Matrix visualization
+												(Actual vs Predicted)
+											</CardDescription>
+										</div>
+									</div>
+
+									{/* Legend */}
+									<div className="flex flex-wrap gap-4">
+										{[
+											{
+												label: "TP",
+												desc: "True Pos",
+												color: "text-teal-600",
+											},
+											{
+												label: "FP",
+												desc: "False Pos",
+												color: "text-red-500",
+											},
+											{
+												label: "FN",
+												desc: "False Neg",
+												color: "text-red-500",
+											},
+											{
+												label: "TN",
+												desc: "True Neg",
+												color: "text-slate-600",
+											},
+										].map((info) => (
+											<div
+												key={info.label}
+												className="flex items-center gap-2"
+											>
+												<span
+													className={`text-xs font-bold ${info.color} bg-slate-50 px-2 py-1 rounded`}
+												>
+													{info.label}
+												</span>
+												<span className="text-[11px] text-slate-400">
+													{info.desc}
+												</span>
+											</div>
+										))}
+									</div>
+								</div>
+							</CardHeader>
+
+							<CardContent className="p-8">
+								<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+									{processedData.map((model) => (
+										<div
+											key={model.algorithm}
+											className="flex flex-col items-center"
+										>
+											<div className="flex items-center gap-2 mb-4">
+												<model.icon
+													className="h-4 w-4"
+													style={{
+														color: model.color,
+													}}
+												/>
+												<h4 className="font-bold text-slate-700">
+													{model.algorithm}
+												</h4>
+											</div>
+											<ConfusionMatrixViz
+												matrix={model.confusion_matrix}
+												color={model.color}
+											/>
+										</div>
+									))}
+								</div>
+							</CardContent>
+						</Card>
+					</motion.div>
+
 					{/* --- Bottom: Table --- */}
 					<motion.div variants={fadeInUp}>
 						<Card className="border border-slate-200 shadow-xl shadow-slate-200/50 rounded-[2rem] bg-white overflow-hidden">
@@ -561,73 +734,76 @@ function ModelBenchmarking() {
 								</CardTitle>
 							</CardHeader>
 							<CardContent className="p-0">
-								<Table>
-									<TableHeader className="bg-slate-50">
-										<TableRow className="hover:bg-transparent border-none">
-											<TableHead className="w-[300px] text-xs font-bold uppercase tracking-widest text-slate-400 py-6 pl-8">
-												Algorithm
-											</TableHead>
-											<TableHead className="text-center text-xs font-bold uppercase tracking-widest text-slate-400 py-6">
-												Accuracy
-											</TableHead>
-											<TableHead className="text-center text-xs font-bold uppercase tracking-widest text-slate-400 py-6">
-												Precision
-											</TableHead>
-											<TableHead className="text-center text-xs font-bold uppercase tracking-widest text-slate-400 py-6">
-												Recall
-											</TableHead>
-											<TableHead className="text-center text-xs font-bold uppercase tracking-widest text-slate-400 py-6">
-												F1-Score
-											</TableHead>
-											<TableHead className="text-right text-xs font-bold uppercase tracking-widest text-slate-400 py-6 pr-8">
-												Status
-											</TableHead>
-										</TableRow>
-									</TableHeader>
-									<TableBody>
-										{processedData.map((model) => (
-											<TableRow
-												key={model.algorithm}
-												className="hover:bg-slate-50/80 border-b border-slate-50 last:border-none transition-colors group"
-											>
-												<TableCell className="font-bold text-slate-700 py-5 pl-8">
-													<div className="flex items-center gap-3">
-														<div
-															className="h-2 w-2 rounded-full"
-															style={{
-																backgroundColor:
-																	model.color,
-															}}
-														/>
-														{model.algorithm}
-													</div>
-												</TableCell>
-												<TableCell className="text-center font-semibold text-slate-600">
-													{model.accuracy}%
-												</TableCell>
-												<TableCell className="text-center font-semibold text-slate-600">
-													{model.precision}%
-												</TableCell>
-												<TableCell className="text-center font-semibold text-slate-600">
-													{model.recall}%
-												</TableCell>
-												<TableCell
-													className="text-center font-bold"
-													style={{
-														color: model.color,
-													}}
-												>
-													{model.f1_score}%
-												</TableCell>
-												<TableCell className="text-right pr-8">
-													<Badge className="font-bold px-3 py-1 rounded-full border-0 bg-teal-100 text-teal-700 hover:bg-teal-200">
-														{model.status}
-													</Badge>
-												</TableCell>
+								{/* Fixed: Added overflow-x-auto to make table responsive on mobile */}
+								<div className="overflow-x-auto">
+									<Table className="min-w-[800px]">
+										<TableHeader className="bg-slate-50">
+											<TableRow className="hover:bg-transparent border-none">
+												<TableHead className="w-[300px] text-xs font-bold uppercase tracking-widest text-slate-400 py-6 pl-8">
+													Algorithm
+												</TableHead>
+												<TableHead className="text-center text-xs font-bold uppercase tracking-widest text-slate-400 py-6">
+													Accuracy
+												</TableHead>
+												<TableHead className="text-center text-xs font-bold uppercase tracking-widest text-slate-400 py-6">
+													Precision
+												</TableHead>
+												<TableHead className="text-center text-xs font-bold uppercase tracking-widest text-slate-400 py-6">
+													Recall
+												</TableHead>
+												<TableHead className="text-center text-xs font-bold uppercase tracking-widest text-slate-400 py-6">
+													F1-Score
+												</TableHead>
+												<TableHead className="text-right text-xs font-bold uppercase tracking-widest text-slate-400 py-6 pr-8">
+													Status
+												</TableHead>
 											</TableRow>
-										))}
-									</TableBody>
-								</Table>
+										</TableHeader>
+										<TableBody>
+											{processedData.map((model) => (
+												<TableRow
+													key={model.algorithm}
+													className="hover:bg-slate-50/80 border-b border-slate-50 last:border-none transition-colors group"
+												>
+													<TableCell className="font-bold text-slate-700 py-5 pl-8">
+														<div className="flex items-center gap-3">
+															<div
+																className="h-2 w-2 rounded-full"
+																style={{
+																	backgroundColor:
+																		model.color,
+																}}
+															/>
+															{model.algorithm}
+														</div>
+													</TableCell>
+													<TableCell className="text-center font-semibold text-slate-600">
+														{model.accuracy}%
+													</TableCell>
+													<TableCell className="text-center font-semibold text-slate-600">
+														{model.precision}%
+													</TableCell>
+													<TableCell className="text-center font-semibold text-slate-600">
+														{model.recall}%
+													</TableCell>
+													<TableCell
+														className="text-center font-bold"
+														style={{
+															color: model.color,
+														}}
+													>
+														{model.f1_score}%
+													</TableCell>
+													<TableCell className="text-right pr-8">
+														<Badge className="font-bold px-3 py-1 rounded-full border-0 bg-teal-100 text-teal-700 hover:bg-teal-200">
+															{model.status}
+														</Badge>
+													</TableCell>
+												</TableRow>
+											))}
+										</TableBody>
+									</Table>
+								</div>
 							</CardContent>
 						</Card>
 					</motion.div>

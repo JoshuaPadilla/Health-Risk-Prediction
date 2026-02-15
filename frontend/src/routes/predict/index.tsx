@@ -18,10 +18,12 @@ import {
 	ArrowLeft,
 	ArrowRight,
 	Binary,
+	Calculator,
 	Check,
 	Cpu,
 	Footprints,
 	HeartPulse,
+	Lock,
 	Moon,
 	Network,
 	Ruler,
@@ -30,7 +32,7 @@ import {
 	Trees,
 	Weight,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/predict/")({
@@ -61,6 +63,9 @@ function RouteComponent() {
 	const [step, setStep] = useState(1);
 	const [direction, setDirection] = useState(0);
 	const totalSteps = 4;
+
+	// State to hold the raw BMI number for display purposes
+	const [calculatedBmi, setCalculatedBmi] = useState<number | null>(null);
 
 	const [formData, setFormData] = useState<PredictionForm>({
 		gender: 0,
@@ -93,6 +98,40 @@ function RouteComponent() {
 						: value,
 		}));
 	};
+
+	// --- AUTOMATIC BMI CALCULATION ---
+	useEffect(() => {
+		const { weight, height } = formData;
+
+		// Only calculate if valid numbers are present
+		if (weight > 0 && height > 0) {
+			// Convert height from cm to meters
+			const heightInMeters = height / 100;
+
+			// Calculate BMI: kg / m^2
+			const bmiValue = weight / (heightInMeters * heightInMeters);
+			setCalculatedBmi(Number(bmiValue.toFixed(1)));
+
+			let categoryIndex = 0;
+
+			// Determine Category based on standard BMI ranges
+			// Ensure these indices match your Bmi_Category options values
+			if (bmiValue < 18.5) {
+				categoryIndex = 0; // Underweight
+			} else if (bmiValue >= 18.5 && bmiValue < 25) {
+				categoryIndex = 1; // Normal
+			} else if (bmiValue >= 25 && bmiValue < 30) {
+				categoryIndex = 2; // Overweight
+			} else {
+				categoryIndex = 3; // Obese
+			}
+
+			// Update formData if the category has changed
+			if (formData.bmi_category !== categoryIndex) {
+				updateField("bmi_category", categoryIndex);
+			}
+		}
+	}, [formData.weight, formData.height]); // Dependencies: runs when weight or height changes
 
 	const nextStep = () => {
 		if (step < totalSteps) {
@@ -512,33 +551,43 @@ function RouteComponent() {
 									{/* STEP 3: HEALTH STATUS */}
 									{step === 3 && (
 										<div className="space-y-8 max-w-3xl mx-auto">
-											<div className="space-y-3">
-												<Label className="text-base font-bold text-slate-900">
-													BMI Category
-												</Label>
-												<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+											<div className="space-y-4">
+												<div className="flex items-center justify-between">
+													<Label className="text-base font-bold text-slate-900">
+														BMI Category
+													</Label>
+													{calculatedBmi !== null &&
+														calculatedBmi > 0 && (
+															<div className="flex items-center gap-2 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
+																<Calculator className="w-3 h-3 text-slate-400" />
+																<span className="text-xs text-slate-500 font-medium">
+																	Calculated
+																	BMI:{" "}
+																	<span className="text-slate-900 font-bold">
+																		{
+																			calculatedBmi
+																		}
+																	</span>
+																</span>
+															</div>
+														)}
+												</div>
+
+												{/* BMI Category Selection - Disabled/ReadOnly */}
+												<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 relative">
+													{/* Overlay to reinforce it is not clickable, though buttons are visually disabled */}
+													<div className="absolute inset-0 z-20 cursor-not-allowed" />
+
 													{Bmi_Category.map(
 														(item) => (
-															<motion.button
+															<motion.div
 																key={item.val}
-																whileHover={{
-																	scale: 1.02,
-																}}
-																whileTap={{
-																	scale: 0.98,
-																}}
-																onClick={() =>
-																	updateField(
-																		"bmi_category",
-																		item.val,
-																	)
-																}
 																className={cn(
-																	"text-left p-4 rounded-xl border transition-all duration-200 hover:bg-slate-50 relative outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
+																	"text-left p-4 rounded-xl border transition-all duration-200 relative pointer-events-none",
 																	formData.bmi_category ===
 																		item.val
-																		? "border-teal-500 bg-teal-50/50 ring-1 ring-teal-500 shadow-md z-10"
-																		: "border-slate-200 bg-white",
+																		? "border-teal-500 bg-teal-50/80 ring-1 ring-teal-500 shadow-md z-10 opacity-100"
+																		: "border-slate-100 bg-slate-50/50 opacity-60 grayscale-[0.5]",
 																)}
 															>
 																<div className="font-bold text-slate-900 mb-1">
@@ -549,19 +598,25 @@ function RouteComponent() {
 																</div>
 																{formData.bmi_category ===
 																	item.val && (
-																	<div className="absolute top-3 right-3 text-teal-600">
-																		<Check
-																			className="w-4 h-4"
-																			strokeWidth={
-																				3
-																			}
-																		/>
+																	<div className="absolute top-3 right-3 text-teal-600 flex gap-1 items-center bg-white/50 rounded-full px-1.5 py-0.5 border border-teal-200/50">
+																		<Lock className="w-3 h-3" />
+																		<span className="text-[10px] font-bold uppercase">
+																			Auto
+																		</span>
 																	</div>
 																)}
-															</motion.button>
+															</motion.div>
 														),
 													)}
 												</div>
+												{(!formData.weight ||
+													!formData.height) && (
+													<p className="text-xs text-red-400 font-medium mt-2">
+														* Please define Height
+														and Weight in Step 1 to
+														calculate BMI.
+													</p>
+												)}
 											</div>
 
 											<div className="space-y-4">

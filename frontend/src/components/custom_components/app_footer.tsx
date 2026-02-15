@@ -56,9 +56,7 @@ export const AppFooter = () => {
 
 				{/* Bottom Legal Section */}
 				<div className="flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-slate-500">
-					<div>
-						Copyright © 2026 BioMetric Inc. All rights reserved.
-					</div>
+					<div>Copyright © 2026 BioMetric. All rights reserved.</div>
 
 					<div className="flex gap-8 font-medium">
 						<Link
