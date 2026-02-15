@@ -15,6 +15,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import {
 	Activity,
+	AlertCircle,
 	ArrowLeft,
 	ArrowRight,
 	Binary,
@@ -31,6 +32,7 @@ import {
 	Timer,
 	Trees,
 	Weight,
+	XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -99,6 +101,9 @@ function RouteComponent() {
 		}));
 	};
 
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, []);
 	// --- AUTOMATIC BMI CALCULATION ---
 	useEffect(() => {
 		const { weight, height } = formData;
@@ -155,10 +160,27 @@ function RouteComponent() {
 		if (!validation.success) {
 			validation.errors.forEach((errorMsg) => {
 				toast.error("Missing Fields", {
+					// --- SOLID WHITE THEME (No Transparency) ---
+					// bg-white: Solid #ffffff
+					// text-slate-950: Darkest text color
+					// shadow-lg: Adds depth without transparency on the card itself
+					className:
+						"!bg-white !opacity-100 text-slate-950 border border-slate-200 shadow-lg",
+
+					// Force white background via style to override any library defaults
+					style: { backgroundColor: "white", opacity: 1 },
+
+					icon: <AlertCircle className="h-5 w-5 text-red-600" />,
+
 					description: (
-						<span className="text-red-400 font-semibold">
-							{errorMsg}
-						</span>
+						<div className="flex flex-col gap-1 mt-1">
+							<span className="text-xs font-bold text-red-600 uppercase tracking-wider">
+								Required
+							</span>
+							<span className="text-sm font-semibold text-slate-800">
+								{errorMsg}
+							</span>
+						</div>
 					),
 					duration: 4000,
 				});
@@ -171,10 +193,19 @@ function RouteComponent() {
 			navigate({ to: "/predict/result" });
 		} catch (error) {
 			console.error(error);
-			toast.error("Submission Failed");
+			toast.error("Submission Failed", {
+				className:
+					"!bg-white !opacity-100 text-slate-950 border border-slate-200 shadow-lg",
+				style: { backgroundColor: "white", opacity: 1 },
+				icon: <XCircle className="h-5 w-5 text-slate-500" />,
+				description: (
+					<span className="text-slate-600 font-medium">
+						Please check your connection and try again.
+					</span>
+				),
+			});
 		}
 	};
-
 	return (
 		<div className="min-h-screen bg-[#0B1120] font-sans text-slate-900 flex flex-col items-center py-8 px-4 md:px-8 relative overflow-hidden">
 			{isLoading && <PredictionLoading />}

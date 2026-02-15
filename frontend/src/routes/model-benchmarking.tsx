@@ -15,6 +15,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { ModelBenchmarks } from "@/static_data/model_benchmarks";
 import { createFileRoute } from "@tanstack/react-router";
 import {
 	motion,
@@ -47,46 +48,6 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
-
-// --- Local Data Definition ---
-const ModelBenchmarks = [
-	{
-		algorithm: "Logistic Regression",
-		accuracy: 93.3,
-		precision: 93.4,
-		recall: 93.3,
-		f1_score: 93.3,
-		status: "Ready",
-		confusion_matrix: [
-			[40, 3],
-			[2, 30],
-		],
-	},
-	{
-		algorithm: "SVM",
-		accuracy: 96.0,
-		precision: 96.0,
-		recall: 96.0,
-		f1_score: 96.0,
-		status: "Ready",
-		confusion_matrix: [
-			[42, 1],
-			[2, 30],
-		],
-	},
-	{
-		algorithm: "Random Forest",
-		accuracy: 96.0,
-		precision: 96.0,
-		recall: 96.0,
-		f1_score: 96.0,
-		status: "Ready",
-		confusion_matrix: [
-			[42, 1],
-			[2, 30],
-		],
-	},
-];
 
 export const Route = createFileRoute("/model-benchmarking")({
 	component: ModelBenchmarking,
@@ -216,6 +177,10 @@ const ConfusionMatrixViz = ({
 };
 
 function ModelBenchmarking() {
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, []);
+
 	const { processedData, chartData, bestModels, maxScore } = useMemo(() => {
 		const maxScore = Math.max(...ModelBenchmarks.map((m) => m.f1_score));
 

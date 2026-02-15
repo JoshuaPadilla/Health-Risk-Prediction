@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Badge } from "@/components/ui/badge";
 import {
 	Card,
 	CardContent,
@@ -6,36 +6,37 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-	Activity,
-	Server,
-	Layout,
-	BrainCircuit,
-	GitBranch,
-	CheckCircle2,
-	Stethoscope,
-	Microscope,
-	HeartPulse,
-	ArrowRight,
-	Target,
-	Database,
-	Cpu,
-} from "lucide-react";
+import { aboutObjectives } from "@/static_data/about_objectives";
+import { createFileRoute } from "@tanstack/react-router";
 import { motion, type Variants } from "framer-motion";
 import {
-	BarChart,
+	Activity,
+	ArrowRight,
+	BrainCircuit,
+	CheckCircle2,
+	Cpu,
+	Database,
+	GitBranch,
+	HeartPulse,
+	Layout,
+	Microscope,
+	Server,
+	Stethoscope,
+	Target,
+} from "lucide-react";
+import { useEffect } from "react";
+import {
 	Bar,
+	BarChart,
+	CartesianGrid,
+	Cell,
+	ResponsiveContainer,
+	Tooltip,
 	XAxis,
 	YAxis,
-	CartesianGrid,
-	Tooltip,
-	ResponsiveContainer,
-	Cell,
 } from "recharts";
 
-// --- YOUR DATA (Themed) ---
-// Updated colors to match the Teal/Blue/Indigo theme
+// --- YOUR DATA (Updated with Confusion Matrix) ---
 export const ModelBenchmarks = [
 	{
 		algorithm: "Logistic Regression",
@@ -44,7 +45,11 @@ export const ModelBenchmarks = [
 		recall: 93.3,
 		f1_score: 93.3,
 		status: "Ready",
-		color: "#818cf8", // Indigo (was Blue)
+		confusion_matrix: [
+			[40, 3], // [TN, FP]
+			[2, 30], // [FN, TP]
+		],
+		color: "#818cf8", // Indigo
 	},
 	{
 		algorithm: "SVM",
@@ -53,7 +58,11 @@ export const ModelBenchmarks = [
 		recall: 96.0,
 		f1_score: 96.0,
 		status: "Ready",
-		color: "#60a5fa", // Blue (was Violet)
+		confusion_matrix: [
+			[42, 1],
+			[2, 30],
+		],
+		color: "#60a5fa", // Blue
 	},
 	{
 		algorithm: "Random Forest",
@@ -62,7 +71,11 @@ export const ModelBenchmarks = [
 		recall: 96.0,
 		f1_score: 96.0,
 		status: "Ready",
-		color: "#2dd4bf", // Teal (was Emerald)
+		confusion_matrix: [
+			[42, 1],
+			[2, 30],
+		],
+		color: "#2dd4bf", // Teal
 	},
 ];
 
@@ -70,7 +83,7 @@ export const Route = createFileRoute("/about")({
 	component: RouteComponent,
 });
 
-// --- Animation Variants (Copied from Theme) ---
+// --- Animation Variants ---
 const fadeInUp: Variants = {
 	hidden: { opacity: 0, y: 30 },
 	visible: {
@@ -92,9 +105,12 @@ const staggerContainer: Variants = {
 };
 
 function RouteComponent() {
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, []);
 	return (
 		<div className="min-h-screen bg-slate-50 font-sans pb-20 overflow-x-hidden">
-			{/* --- Background Section (Matches Previous Theme) --- */}
+			{/* --- Background Section --- */}
 			<div className="relative pt-12 pb-32 md:pt-16 md:pb-48 bg-[#0F172A] overflow-hidden">
 				{/* Background Gradients */}
 				<div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-blue-900/20 rounded-full blur-[100px] pointer-events-none" />
@@ -140,40 +156,61 @@ function RouteComponent() {
 					animate="visible"
 					className="space-y-12"
 				>
-					{/* --- System Objectives (Glass Card) --- */}
-					<motion.div variants={fadeInUp}>
-						<Card className="border border-slate-700/50 bg-slate-800/80 backdrop-blur-md shadow-2xl rounded-[2rem] overflow-hidden relative">
-							<div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-teal-500 to-blue-500" />
+					{/* --- System Objectives --- */}
+					<motion.div
+						variants={fadeInUp}
+						initial="initial"
+						animate="animate"
+					>
+						<Card className="group border border-slate-700/50 bg-slate-800/80 backdrop-blur-md shadow-2xl rounded-[2rem] overflow-hidden relative">
+							<div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-teal-400 via-teal-500 to-blue-600" />
+
 							<CardHeader className="p-8 pb-4">
-								<CardTitle className="flex items-center gap-3 text-2xl text-white">
-									<CheckCircle2 className="h-6 w-6 text-teal-500" />
+								<CardTitle className="flex items-center gap-3 text-2xl text-white font-bold tracking-tight">
+									<div className="p-2 rounded-lg bg-teal-500/10 border border-teal-500/20">
+										<CheckCircle2 className="h-6 w-6 text-teal-400" />
+									</div>
 									Research Objectives
 								</CardTitle>
 							</CardHeader>
-							<CardContent className="p-8 pt-2 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-								{[
-									"Early detection of potential health risks",
-									"Comparative analysis of ML algorithms (LR, SVM, RF)",
-									"Minimize false negatives in diagnostics",
-									"Provide explainable metrics for providers",
-									"Seamless Python to Node.js integration",
-									"Real-time inference capability",
-								].map((obj, i) => (
+
+							<CardContent className="p-8 pt-4 grid gap-4 grid-cols-1 md:grid-cols-2">
+								{aboutObjectives.map((obj, i) => (
 									<div
-										key={i}
-										className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/5"
+										key={obj.id}
+										className="group/item flex items-start gap-4 p-4 rounded-2xl bg-slate-900/40 hover:bg-slate-700/40 border border-white/5 hover:border-teal-500/30 transition-all duration-300"
 									>
-										<div className="h-1.5 w-1.5 mt-2 rounded-full bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)] shrink-0" />
-										<span className="text-sm text-slate-300 font-medium leading-relaxed">
-											{obj}
-										</span>
+										<div className="mt-1.5 flex h-2 w-2 shrink-0 rounded-full bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.6)] group-hover/item:shadow-[0_0_12px_rgba(45,212,191,1)] group-hover/item:scale-125 transition-transform" />
+
+										<p className="text-sm text-slate-300 font-medium leading-relaxed">
+											{obj.text.split(obj.highlight)
+												.length > 1 ? (
+												<>
+													{
+														obj.text.split(
+															obj.highlight,
+														)[0]
+													}
+													<span className="text-teal-200 font-bold">
+														{obj.highlight}
+													</span>
+													{
+														obj.text.split(
+															obj.highlight,
+														)[1]
+													}
+												</>
+											) : (
+												obj.text
+											)}
+										</p>
 									</div>
 								))}
 							</CardContent>
 						</Card>
 					</motion.div>
 
-					{/* --- Architecture & Tech Stack --- */}
+					{/* --- Architecture --- */}
 					<div className="space-y-8">
 						<motion.div
 							variants={fadeInUp}
@@ -204,9 +241,9 @@ function RouteComponent() {
 									</CardHeader>
 									<CardContent className="p-8 pt-2 space-y-6">
 										<p className="text-sm text-slate-600 leading-relaxed font-medium">
-											Interactive dashboard for doctors to
-											input patient parameters and
-											visualize risk probabilities.
+											Interactive dashboard for users to
+											input parameters and visualize risk
+											probabilities.
 										</p>
 										<div className="flex flex-wrap gap-2">
 											{[
@@ -227,7 +264,7 @@ function RouteComponent() {
 								</Card>
 							</motion.div>
 
-							{/* Backend - Swapped Red for Indigo to fit theme */}
+							{/* Backend */}
 							<motion.div variants={fadeInUp} className="h-full">
 								<Card className="h-full border border-slate-200 shadow-xl shadow-slate-200/50 rounded-[2rem] bg-white transition-all duration-300 hover:scale-[1.02]">
 									<CardHeader className="p-8 pb-4">
@@ -243,8 +280,8 @@ function RouteComponent() {
 									</CardHeader>
 									<CardContent className="p-8 pt-2 space-y-6">
 										<p className="text-sm text-slate-600 leading-relaxed font-medium">
-											NestJS manages user authentication,
-											patient records, and orchestrates
+											NestJS manages user input data,
+											validate data, and orchestrates
 											requests to the prediction engine.
 										</p>
 										<div className="flex flex-wrap gap-2">
@@ -407,12 +444,12 @@ function RouteComponent() {
 								</CardContent>
 							</Card>
 
-							{/* Detailed Metrics List */}
+							{/* Detailed Metrics List with Confusion Matrix */}
 							<div className="space-y-4">
 								{ModelBenchmarks.map((model, i) => (
 									<Card
 										key={i}
-										className="border border-slate-200 shadow-lg shadow-slate-200/50 rounded-3xl bg-white overflow-hidden group"
+										className="border border-slate-200 shadow-lg shadow-slate-200/50 rounded-3xl bg-white overflow-hidden group hover:scale-[1.02] transition-transform duration-300"
 									>
 										<div
 											className="h-1.5 w-full"
@@ -433,45 +470,99 @@ function RouteComponent() {
 												</span>
 											</CardTitle>
 										</CardHeader>
-										<CardContent className="p-6 pt-2 grid grid-cols-3 gap-2 text-center">
-											<div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
-												<div className="font-bold text-slate-700 text-sm">
-													{model.precision}%
+										<CardContent className="p-6 pt-2 space-y-4">
+											{/* Metric Grid */}
+											<div className="grid grid-cols-3 gap-2 text-center">
+												<div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
+													<div className="font-bold text-slate-700 text-sm">
+														{model.precision}%
+													</div>
+													<div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mt-1">
+														Prec
+													</div>
 												</div>
-												<div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mt-1">
-													Prec
-												</div>
-											</div>
-											<div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
-												<div className="font-bold text-slate-700 text-sm">
-													{model.recall}%
-												</div>
-												<div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mt-1">
-													Recall
-												</div>
-											</div>
-											<div
-												className="p-2 rounded-xl border"
-												style={{
-													backgroundColor: `${model.color}10`, // 10% opacity
-													borderColor: `${model.color}30`,
-												}}
-											>
-												<div
-													className="font-bold text-sm"
-													style={{
-														color: model.color,
-													}}
-												>
-													{model.f1_score}%
+												<div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
+													<div className="font-bold text-slate-700 text-sm">
+														{model.recall}%
+													</div>
+													<div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mt-1">
+														Recall
+													</div>
 												</div>
 												<div
-													className="text-[10px] uppercase tracking-wider font-bold mt-1 opacity-70"
+													className="p-2 rounded-xl border"
 													style={{
-														color: model.color,
+														backgroundColor: `${model.color}10`,
+														borderColor: `${model.color}30`,
 													}}
 												>
-													F1
+													<div
+														className="font-bold text-sm"
+														style={{
+															color: model.color,
+														}}
+													>
+														{model.f1_score}%
+													</div>
+													<div
+														className="text-[10px] uppercase tracking-wider font-bold mt-1 opacity-70"
+														style={{
+															color: model.color,
+														}}
+													>
+														F1
+													</div>
+												</div>
+											</div>
+
+											{/* Confusion Matrix Visualization */}
+											<div className="pt-2 border-t border-slate-100">
+												<p className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2 text-center">
+													Confusion Matrix
+												</p>
+												<div className="grid grid-cols-2 gap-1 text-center font-mono text-xs">
+													{/* Top Row */}
+													<div
+														className="py-2 rounded bg-slate-50 text-slate-600"
+														title="True Negative"
+													>
+														TN:{" "}
+														{
+															model
+																.confusion_matrix[0][0]
+														}
+													</div>
+													<div
+														className="py-2 rounded bg-red-50 text-red-500 font-bold"
+														title="False Positive"
+													>
+														FP:{" "}
+														{
+															model
+																.confusion_matrix[0][1]
+														}
+													</div>
+													{/* Bottom Row */}
+													<div
+														className="py-2 rounded bg-red-50 text-red-500 font-bold"
+														title="False Negative"
+													>
+														FN:{" "}
+														{
+															model
+																.confusion_matrix[1][0]
+														}
+													</div>
+													<div
+														className="py-2 rounded bg-slate-50 text-slate-600"
+														title="True Positive"
+													>
+														TP:{" "}
+														{
+															model
+																.confusion_matrix[1][1]
+														}
+													</div>
 												</div>
 											</div>
 										</CardContent>
@@ -508,7 +599,6 @@ function RouteComponent() {
 								</span>
 							</div>
 
-							{/* Arrow */}
 							<ArrowRight className="text-slate-600 h-6 w-6 hidden md:block" />
 							<ArrowRight className="text-slate-600 h-6 w-6 md:hidden rotate-90" />
 
@@ -522,7 +612,6 @@ function RouteComponent() {
 								</span>
 							</div>
 
-							{/* Arrow */}
 							<ArrowRight className="text-slate-600 h-6 w-6 hidden md:block" />
 							<ArrowRight className="text-slate-600 h-6 w-6 md:hidden rotate-90" />
 
@@ -536,7 +625,6 @@ function RouteComponent() {
 								</span>
 							</div>
 
-							{/* Arrow */}
 							<ArrowRight className="text-slate-600 h-6 w-6 hidden md:block" />
 							<ArrowRight className="text-slate-600 h-6 w-6 md:hidden rotate-90" />
 

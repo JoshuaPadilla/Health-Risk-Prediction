@@ -10,6 +10,7 @@ import {
 	ShieldCheck,
 	Zap,
 } from "lucide-react";
+import { useEffect } from "react";
 import hero_image from "../../public/homepage-image.png";
 
 // Ideally, import your Navbar and Footer components here if they exist externally
@@ -64,6 +65,9 @@ const float: Variants = {
 function Home() {
 	const navigate = useNavigate();
 
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, []);
 	return (
 		<div className="min-h-screen bg-white text-slate-900 font-sans flex flex-col overflow-x-hidden">
 			<main className="flex-1">
@@ -251,7 +255,7 @@ function Home() {
 
 				{/* --- Workflow Section --- */}
 				<section className="py-24 bg-white relative overflow-hidden">
-					{/* Background Grid for technical feel */}
+					{/* Background Grid */}
 					<div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:40px_40px]" />
 
 					<div className="container mx-auto px-4 text-center relative z-10">
@@ -265,13 +269,15 @@ function Home() {
 						</motion.h2>
 
 						<motion.div
-							className="flex flex-col md:flex-row items-start md:items-center justify-center gap-8 md:gap-0 relative max-w-5xl mx-auto"
+							// CHANGED: items-start -> items-center
+							// CHANGED: gap-8 -> gap-12 (More breathing room for vertical flow)
+							className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-0 relative max-w-5xl mx-auto"
 							initial="hidden"
 							whileInView="visible"
 							viewport={{ once: true }}
 							variants={staggerContainer}
 						>
-							{/* Connector Line (Desktop) */}
+							{/* --- Connector Line (Desktop) --- */}
 							<div className="hidden md:block absolute top-[48px] left-[10%] right-[10%] h-1 bg-slate-100 z-0">
 								<motion.div
 									className="h-full bg-gradient-to-r from-teal-500 to-blue-500 origin-left"
@@ -281,33 +287,52 @@ function Home() {
 								/>
 							</div>
 
+							{/* --- Connector Line (Mobile) --- 
+                Added this so the steps are connected vertically on phones 
+            */}
+							<div className="md:hidden absolute top-0 bottom-0 left-1/2 w-1 bg-slate-100 -translate-x-1/2 z-0">
+								<motion.div
+									className="w-full h-full bg-gradient-to-b from-teal-500 to-blue-500 origin-top"
+									initial={{ scaleY: 0 }}
+									whileInView={{ scaleY: 1 }}
+									transition={{ duration: 1.5, delay: 0.5 }}
+								/>
+							</div>
+
 							{/* Step 1 */}
-							<WorkflowStep
-								icon={
-									<FileText className="h-10 w-10 text-slate-400 group-hover:text-blue-500 transition-colors" />
-								}
-								title="1. Input Data"
-								description="Enter basic health metrics"
-							/>
+							{/* Added relative & z-10 to ensure steps sit ON TOP of the connector lines */}
+							<div className="relative z-10 bg-white p-2 rounded-xl">
+								<WorkflowStep
+									icon={
+										<FileText className="h-10 w-10 text-slate-400 group-hover:text-blue-500 transition-colors" />
+									}
+									title="1. Input Data"
+									description="Enter basic health metrics"
+								/>
+							</div>
 
 							{/* Step 2 (Highlighted) */}
-							<WorkflowStep
-								icon={
-									<BrainCircuit className="h-12 w-12 text-white" />
-								}
-								title="2. AI Analysis"
-								description="Neural Engine Processing"
-								isMain={true}
-							/>
+							<div className="relative z-10 bg-white p-2 rounded-xl">
+								<WorkflowStep
+									icon={
+										<BrainCircuit className="h-12 w-12 text-white" />
+									}
+									title="2. AI Analysis"
+									description="Neural Engine Processing"
+									isMain={true}
+								/>
+							</div>
 
 							{/* Step 3 */}
-							<WorkflowStep
-								icon={
-									<ClipboardList className="h-10 w-10 text-slate-400 group-hover:text-teal-500 transition-colors" />
-								}
-								title="3. Get Profile"
-								description="View Risk Assessment"
-							/>
+							<div className="relative z-10 bg-white p-2 rounded-xl">
+								<WorkflowStep
+									icon={
+										<ClipboardList className="h-10 w-10 text-slate-400 group-hover:text-teal-500 transition-colors" />
+									}
+									title="3. Get Profile"
+									description="View Risk Assessment"
+								/>
+							</div>
 						</motion.div>
 
 						<div className="mt-16">
