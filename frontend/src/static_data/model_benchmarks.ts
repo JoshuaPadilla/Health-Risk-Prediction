@@ -1,4 +1,14 @@
-export const ModelBenchmarks = [
+export type BenchmarkEntry = {
+	algorithm: string;
+	accuracy: number;
+	precision: number;
+	recall: number;
+	f1_score: number;
+	status: string;
+	confusion_matrix: number[][];
+};
+
+export const ModelBenchmarks: BenchmarkEntry[] = [
 	{
 		algorithm: "Logistic Regression",
 		accuracy: 93.3,

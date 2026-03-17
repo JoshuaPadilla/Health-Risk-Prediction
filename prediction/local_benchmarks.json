@@ -1,0 +1,56 @@
+[
+    {
+        "algorithm": "Logistic Regression",
+        "accuracy": 80.9,
+        "precision": 78.6,
+        "recall": 80.9,
+        "f1_score": 76.5,
+        "status": "Ready",
+        "confusion_matrix": [
+            [
+                36,
+                1
+            ],
+            [
+                8,
+                2
+            ]
+        ]
+    },
+    {
+        "algorithm": "Random Forest",
+        "accuracy": 80.9,
+        "precision": 84.6,
+        "recall": 80.9,
+        "f1_score": 74.1,
+        "status": "Ready",
+        "confusion_matrix": [
+            [
+                37,
+                0
+            ],
+            [
+                9,
+                1
+            ]
+        ]
+    },
+    {
+        "algorithm": "SVM",
+        "accuracy": 66.0,
+        "precision": 72.7,
+        "recall": 66.0,
+        "f1_score": 68.4,
+        "status": "Ready",
+        "confusion_matrix": [
+            [
+                26,
+                11
+            ],
+            [
+                5,
+                5
+            ]
+        ]
+    }
+]

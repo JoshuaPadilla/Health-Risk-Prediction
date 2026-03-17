@@ -175,7 +175,7 @@ function RouteComponent() {
 							</CardHeader>
 
 							<CardContent className="p-8 pt-4 grid gap-4 grid-cols-1 md:grid-cols-2">
-								{aboutObjectives.map((obj, i) => (
+								{aboutObjectives.map((obj) => (
 									<div
 										key={obj.id}
 										className="group/item flex items-start gap-4 p-4 rounded-2xl bg-slate-900/40 hover:bg-slate-700/40 border border-white/5 hover:border-teal-500/30 transition-all duration-300"
