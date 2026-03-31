@@ -1,10 +1,17 @@
-import { IsNumber, IsEnum, IsNotEmpty, Min, Max } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, Max, Min } from 'class-validator';
+import { Department } from 'src/enums/department.enum';
 import { PredictionModel } from 'src/enums/prediction_model';
 
 export class PredictionFormDto {
   @IsNumber()
   @IsNotEmpty()
   gender: number;
+
+  @IsEnum(Department, {
+    message:
+      'department must be one of COM, CCIS, CAT, CEA, CCJS, COED, or CON',
+  })
+  department: Department;
 
   @IsNumber()
   @Min(0)

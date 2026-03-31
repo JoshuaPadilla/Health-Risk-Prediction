@@ -6,15 +6,17 @@ import { create } from "zustand";
 type StoreProps = {
 	isLoading: boolean;
 	predictionResult: PredictionResult | null;
+	currentForm: PredictionForm | null;
 	sendPrediction: (form: PredictionForm) => Promise<void>;
 };
 
 export const usePredictionStore = create<StoreProps>((set) => ({
 	isLoading: false,
 	predictionResult: null,
+	currentForm: null,
 	sendPrediction: async (form) => {
 		try {
-			set({ isLoading: true });
+			set({ isLoading: true, currentForm: form });
 			const [res] = await Promise.all([
 				fetch(`${BaseUrl}prediction/predict`, {
 					method: "POST",

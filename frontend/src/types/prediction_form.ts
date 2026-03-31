@@ -1,7 +1,9 @@
+import { type Department } from "@/enums/departments.enum";
 import { type Model } from "@/enums/models.enum";
 
 export type PredictionForm = {
 	gender: number;
+	department: Department | "";
 	height: number;
 	weight: number;
 	age: number;

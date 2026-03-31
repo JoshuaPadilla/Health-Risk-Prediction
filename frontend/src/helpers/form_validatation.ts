@@ -6,6 +6,7 @@ export const validatePredictionForm = (
 	const errors: string[] = [];
 
 	// Step 1: Identity
+	if (!data.department) errors.push("Please select your Department.");
 	if (data.age <= 0) errors.push("Please enter a valid Age.");
 	if (data.height <= 0) errors.push("Please enter a valid Height.");
 	if (data.weight <= 0) errors.push("Please enter a valid Weight.");

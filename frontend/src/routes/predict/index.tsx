@@ -4,10 +4,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import type { Department } from "@/enums/departments.enum";
 import { validatePredictionForm } from "@/helpers/form_validatation";
 import { cn } from "@/lib/utils";
 import { Assessment_Steps } from "@/static_data/assessment_steps";
 import { Bmi_Category } from "@/static_data/bmi_category_options";
+import { DepartmentOptions } from "@/static_data/department_options";
 import { GenderOptions } from "@/static_data/gender_options";
 import { usePredictionStore } from "@/stores/prediction_store";
 import type { PredictionForm } from "@/types/prediction_form";
@@ -19,6 +21,7 @@ import {
 	ArrowLeft,
 	ArrowRight,
 	Binary,
+	Building2,
 	Calculator,
 	Check,
 	Cpu,
@@ -71,6 +74,7 @@ function RouteComponent() {
 
 	const [formData, setFormData] = useState<PredictionForm>({
 		gender: 0,
+		department: "",
 		age: 0,
 		height: 0,
 		weight: 0,
@@ -93,7 +97,7 @@ function RouteComponent() {
 		setFormData((prev) => ({
 			...prev,
 			[field]:
-				field === "model"
+				field === "model" || field === "department"
 					? value
 					: typeof value === "string" && value !== ""
 						? Number(value)
@@ -309,6 +313,83 @@ function RouteComponent() {
 									{/* STEP 1: DEMOGRAPHICS */}
 									{step === 1 && (
 										<div className="space-y-8 max-w-3xl mx-auto">
+											<div className="space-y-4">
+												<div className="flex items-center gap-2">
+													<Building2 className="h-5 w-5 text-teal-600" />
+													<Label className="text-base font-bold text-slate-800">
+														Department
+													</Label>
+												</div>
+												<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+													{DepartmentOptions.map(
+														(department) => {
+															const Icon =
+																department.icon;
+															const isSelected =
+																formData.department ===
+																department.value;
+
+															return (
+																<motion.button
+																	key={
+																		department.value
+																	}
+																	whileHover={{
+																		scale: 1.01,
+																		y: -2,
+																	}}
+																	whileTap={{
+																		scale: 0.99,
+																	}}
+																	onClick={() =>
+																		updateField(
+																			"department",
+																			department.value as Department,
+																		)
+																	}
+																	className={cn(
+																		"relative flex items-center gap-4 rounded-2xl border p-4 text-left transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-teal-500",
+																		isSelected
+																			? "border-teal-500 bg-teal-50 shadow-lg shadow-teal-500/10"
+																			: "border-slate-100 bg-white hover:border-slate-200 hover:bg-slate-50",
+																	)}
+																>
+																	<div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-100 text-slate-500">
+																		<Icon className="h-6 w-6" />
+																	</div>
+																	<div className="min-w-0">
+																		<p className="text-sm font-black tracking-wide text-slate-900">
+																			{
+																				department.description
+																			}
+																		</p>
+																		<p className="text-sm font-semibold text-slate-700 leading-snug">
+																			{
+																				department.label
+																			}
+																		</p>
+																		<p className="text-xs text-slate-400 mt-1 uppercase tracking-wider">
+																			Logo
+																			placeholder
+																		</p>
+																	</div>
+																	{isSelected && (
+																		<div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-teal-500 flex items-center justify-center text-white">
+																			<Check
+																				className="w-3 h-3"
+																				strokeWidth={
+																					3
+																				}
+																			/>
+																		</div>
+																	)}
+																</motion.button>
+															);
+														},
+													)}
+												</div>
+											</div>
+
 											<div className="space-y-4">
 												<Label className="text-base font-bold text-slate-800">
 													Biological Sex
