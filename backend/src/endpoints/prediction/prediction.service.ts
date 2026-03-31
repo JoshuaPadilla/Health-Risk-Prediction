@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { lastValueFrom } from 'rxjs';
 import { PredictionFormDto } from 'src/dto/prediction_form_dto';
@@ -9,6 +9,8 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class PredictionService {
+  private readonly logger = new Logger(PredictionService.name);
+
   constructor(
     private readonly httpService: HttpService,
     @InjectRepository(PredictionRecord)
@@ -16,19 +18,33 @@ export class PredictionService {
   ) {}
 
   async predict(data: PredictionFormDto) {
-    const request$ = this.httpService.post(`predict/${data.model}`, data, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    this.logger.log('Prediction request received', { model: data.model });
 
-    const res = await lastValueFrom(request$);
-    const result = res.data as PredictionResult;
+    try {
+      const request$ = this.httpService.post(`predict/${data.model}`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-    const record = this.predictionRecordRepository.create({ ...data });
-    await this.predictionRecordRepository.save(record);
+      const res = await lastValueFrom(request$);
+      const result = res.data as PredictionResult;
+      this.logger.log('Prediction result received', {
+        riskStatus: result,
+      });
 
-    return result;
+      this.logger.log('Creating prediction record...');
+      const record = this.predictionRecordRepository.create({ ...data });
+      this.logger.log('Record created, saving to database...');
+
+      const saved = await this.predictionRecordRepository.save(record);
+      this.logger.log('Record saved successfully', { recordId: saved.id });
+
+      return result;
+    } catch (error) {
+      this.logger.error('Error during prediction or save', error);
+      throw error;
+    }
   }
 
   async findAll(): Promise<PredictionRecord[]> {

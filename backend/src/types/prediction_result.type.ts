@@ -3,6 +3,7 @@ import { RecommendationStatus } from 'src/enums/recomendation_status.enum';
 import { RecommendationCategory } from 'src/enums/recomendations_category.enum';
 
 export type PredictionResult = {
+  riskStatus: any;
   model_used: PredictionModel;
   risk_prediction: number;
   risk_probability: number;
