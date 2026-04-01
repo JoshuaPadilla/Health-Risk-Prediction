@@ -8,7 +8,14 @@ import {
 	SheetTrigger,
 } from "@/components/ui/sheet";
 import { Link } from "@tanstack/react-router";
-import { BarChart2, Home, Info, Menu, Zap } from "lucide-react";
+import {
+	BarChart2,
+	Home,
+	Info,
+	LayoutDashboard,
+	Menu,
+	Zap,
+} from "lucide-react";
 import { useState } from "react";
 
 const navItems = [
@@ -18,6 +25,7 @@ const navItems = [
 		href: "/model-benchmarking",
 		icon: BarChart2,
 	},
+	{ label: "Insights", href: "/insights", icon: LayoutDashboard },
 	{ label: "Predict", href: "/predict", icon: Zap },
 	{ label: "About", href: "/about", icon: Info },
 ];
