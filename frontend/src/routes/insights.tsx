@@ -442,9 +442,10 @@ function InsightsPage() {
 													}}
 												/>
 												<Tooltip
-													formatter={(
-														value: number,
-													) => [value, "Records"]}
+													formatter={(value) => [
+														value ?? 0,
+														"Records",
+													]}
 													labelStyle={{
 														color: "#0f172a",
 													}}
@@ -477,9 +478,6 @@ function InsightsPage() {
 											<p className="text-sm text-slate-500">
 												Total records: {item.total}
 											</p>
-										</div>
-										<p className="text-sm text-slate-600">
-											Latest:{" "}
 											<Badge className="mt-2 border border-cyan-200 bg-cyan-50 text-cyan-700">
 												{(
 													(item.total /
@@ -488,6 +486,9 @@ function InsightsPage() {
 												).toFixed(1)}
 												%
 											</Badge>
+										</div>
+										<p className="text-sm text-slate-600">
+											Latest:{" "}
 											{formatDate(item.latestCreatedAt)}
 										</p>
 									</div>
