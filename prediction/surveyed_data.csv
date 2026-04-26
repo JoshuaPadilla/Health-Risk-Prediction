@@ -131,3 +131,227 @@ Female,22,160,67,120/80,75,6.5,7,30,"5,000 - 8,000 (Moderate Activity)",3
 1,20,167,74,135/80,80,8,6,60,1000,7
 0,22,154,53,110/90,65,8,5,20,500,2
 1,24,178,75,129/75,75,6,4,100,8000,6
+F,22,157,52,110/90,75,6,7,20 mins,Sedentary,5
+M,23,185,68,120/80,75,4,1,1 hr,Moderate Activity,4
+M,21,152,48,160/40,72,6,7,40 mins,Moderate Activity,3
+F,20,154,53,120/80,75,6,8,30 mins,Moderate Activity,2
+M,23,159,62,110/90,75,5,6,1 hr,Moderate Activity,3
+F,23,152,47,112/78,95,,4,1 hr 30 mins,Moderate Activity,6
+F,18,161,72,90/6,95,7,8,40 mins,Light Activity,3
+M,21,155,42,109/67,61,6,,2 hr,Active,
+F,22,189,83,124/70,64,,6,1 hr,Moderate Activity,4
+F,22,164,49,120/80,75,6,5,10 mins,Lihgt Activity,6
+F,23,149,50,120/80,25,6,3,10 mins,Light Activity,3
+F,23,158,50,120/80,35,8,9,20 mins,Light Activity,4
+F,25,150,30,150/78,75,7,7,20 mins,Light Activity,10
+F,24,155,55,101/80,75,7,5,20 mins,Moderate Activity,8
+F,22,149,42,120/80,75,5,5,20 mins,Sedentary,2
+F,22,152,52,110/80,75,6,6,30,Moderate Activity,5
+M,22,165,70,120/80,75,6,4,1 hr,Light Activity,1
+F,24,152,40,101/80,75,6,5,,Light Activity,10
+F,23,156,50,110/80,75,7,6,50 mins,Light Activity,5
+M,20,173,75,120/80,78,8,10,60 mins,Active,5
+M,18,165,60,127/73,72,5,4,20 mins,Light Activity,7
+F,19,149,46,120/85,72,4-5,4,20 mins,Light Activity,7
+M,21,150,48,150/78,80,8,8,45 mins,Light Activity,3
+F,19,155,39,120/80,82,8,8,30 mins,Active,8
+F,24,178,60,110/60,80,3,1,1 hr,Moderate Activity,10
+F,20,154,51,110/80,66,5,5,40 mins,Light Activity,2
+F,22,155,55,120/60,75,8,8,20 mins,Light Activity,6
+F,24,154,53,127/73,75,7,7,30 mins,Moderate Activity,5
+F,23,151,45,,75,5-6,5,30 mins,Moderate Activity,8
+M,23,157,68,,75,6-8,8,30 mins,Moderate Activity,6
+F,18,154,80,90/80,75,7,5,30 mins,Sedentary,2
+M,24,187,40,95,61,7,9,30 mins,Sedentary,1
+F,20,197,65,125/75,80,4,6,40 mins,Sedentary,4
+M,25,159,89,122/78,63,6,5,1 hr,Sedentary,3
+M,,163,165,120/80,75,5,4,40 mins,Sedentary,4
+M,18,176,62,,82,5-7,7,,Sedentary,1
+F,19,147,36,,82,7,5,10 mins,Light Activity,3
+F,20,159,51,70/80,75,2,2,45 mins,Light Activity,9
+F,20,147,32,,67,7,3,10 mins,Sedentary,3
+F,22,157,70,120/80,75,6 ,8,30 mins,Sedentary,1
+F,22,157,70,120/80,75,6,,,Sedentary,1
+F,23,165,76,Normal,75,7,6,30 mins,Moderate Activity,5
+M,24,165,67,120/80,75,7,7,30 mins,Moderate Activity,3
+F,20,,60,,75,7,6,3 mins,Light Activity,5
+F,24,180,45,110/80,75,5-6,5,80 mins,Light Activity,5
+M,23,165,58,120/80,75,7,6,1 hr,Light Activity,4
+M,23,174,45,120/80,75,5,5,30 mins,Sedentary,3
+F,25,178,89,120/80,84,4,4,1 hr,Sedentary,5
+M,22,150,54,126/73,75,5,5,30 mins,Moderate Activity,5
+F,23,158,64,110/90,75,7,8,2 hrs,Active,1
+M,19,177,70,110/90,75,7,7,1 hr,Sedentary,3
+M,18,145,45,124/70,75,41,7,40 mins,Sedentary,7
+F,25,166,96,132/86,75,42,4,40 mins,Sedentary,5
+M,190,165,94,109/67,75,7,6,1 hr,Sedentary,7
+F,20,165,56,140/86,75,8,4,1 hr,Light Activity,7
+M,20,195,99,124/77,66,57,5,30 mins,Sedentary,2
+M,24,188,67,111/60,94,74,4,1 hr,Sedentary,9
+F,24,188,67,114/77,85,48,5,25 mins,Moderate Activity,5
+M,21,159,55,126/76,75,8,8,2 hrs,Active,3
+F,26,161,57,110/61,75,7,7,1 hr 30 mins,Light Activity,3
+M,19,151,62,117/69,64,5,6,1 hr,Sedentary,3
+M,24,177,57,126/76,77,6,7,1 hr,Light Activity,3
+M,21,168,53,136/86,68,57,5,40 mins,Sedentary,5
+F,23,158,80,120/80,75,61,7,1 hr,Light Activity,3
+M,23,160,72,120/80,75,62,5,1 hr 20 mins,Lihgt Activity,4
+F,24,183,71,120/80,75,61,4,40 mins,Sedentary,5
+F,25,153,88,120/67,71,43,3,1 hr,Light Activity,2
+F,18,152,43,125/72,75,3,3,30 mins,Sedentary,9
+F,20,156,49,120/80,75,42,4,20 mins,Sedentary,7
+F,18,152,48,120/80,75,61,6,30 mins,Sedentary,5
+F,18,153,55,120/80,75,6,6,30 mins,Sedentary,7
+M,21,167,59,120/80,75,6,5,30 mins,Sedentary,5
+M,19,153,77,110/90,75,5,5,$0 mins,Sedentary,5
+F,20,152,50,112/63,75,4,6,30 mins,Sedentary,4
+F,19,153,72,120/67,62,6,6,2 hrs,Active,3
+M,19,162,55,120/75,75,6,5,50 mins,Light Activity,3
+M,23,163,53,120/80,75,7,8,1 hr,Lihgt Activity,3
+M,19,154,55,120/80,75,7,8,2 hrs,Active,2
+F,18,159,52,120/80,75,6,7,1 hr,Moderate Activity,2
+F,23,185,63,120/80,75,7,7,20 mins,Sedentary,3
+M,23,171,48,120/80,75,6,6,1 hr 30 mins,Lihgt Activity,2
+F,24,163,58,120/80,75,5,6,30 mins,Sedentary,4
+F,20,150,47,120/80,75,7,8,30 mins,Sedentary,3
+F,18,159,52,120/80,75,5,5,40 mins,Sedentary,3
+M,22,167,59,110/90,64,3,2,1 hr,Light Activity,8
+M,22,159,52,120/80,75,65,6,50 mins,Light Activity,4
+M,23,156,57,115/85,63,4,4,30 mins,Sedentary,6
+F,20,152,46,120/80,75,41,4,30 mins,Sedentary,5
+M,20,185,63,120/80,75,6,6,2 hrs,Light Activity,2
+M,19,163,65,120/80,75,7,8,20 mins,Sedentary,2
+M,23,163,65,125/85,75,5,5,1 hr,Light Activity,4
+M,24,155,48,120/80,75,7 ,8,1o mins,Sedentary,2
+M,22,156,46,125/75,72,6,6,1 hr,Light Activity,5
+F,20,159,50,110/90,63,3,2,30 mins,Sedentary,2
+F,18,157,50,120/80,75,7,7,45 mins,Light Activity,5
+F,20,150,38,100/70,58,7,7,30 mins,Sedentary,6
+F,19,153,40,110/80,62,56,5,40 mins,Light Activity,8
+F,21,175,60,129/80,80,7,4,25 min,Moderate Activity,4
+F,23,180,59,129/80,90,7,5,20 min,Light Activity,5
+F,23,180,71,130/80,90,7,3,25 min ,Light Activity,7
+M,26,170,55,129/80,80,7,5,20 min ,Light Activity,5
+F,24,180,75,130/80,70,7,4,20 min ,Light Activity,4
+F,23,180,61,120/80,80,7,5,15 min ,Light Activity,5
+F,26,179,55,129/80,90,8,5,40 min ,Moderate Activity,5
+M,26,165,58,130/89,90,9,5,10 min,Light Activity,6
+F,19,175,58,129/80,90,8,5,15 min ,Light Activity,5
+F,19,169,56,130/80,80,7,6,5 min ,Light Activity,4
+F,21,150,57,129/80,75,9,6,30 min ,Light Activity,5
+F,23,180,73,120/80,80,7,5,25 min ,Moderate Activity,4
+F,26,175,61,129/80,70,6,5,30 min ,Moderate Activity,5
+M,23,175,67,130/80,85,7,4,15 min ,Light Activity,5
+F,23,180,73,129/80,90,6,6,25min ,Light Activity,6
+M,25,175,63,129/80,100,5,3,5 min ,Sedentary,7
+F,20,175,60,120/70,90,6,5,20 min ,Light Activity,5
+M,23,160,50,120/70,90,7,5,15 min ,Light Activity,5
+F,23,185,70,120/60,85,7,4,30 min ,Light Activity,6
+M,25,180,60,120/70 ,80,8,5,25 min ,Light Activity,5
+M,26,175,53,120/80,90,7,5,20 min ,Light Activity,5
+F,25,150,57,120/70,90,6,4,15 min ,Sedentary,4
+F,24,150,60,120/80,90,7,6,20 min,Light Activity,5
+F,24,180,65,120/80,90,7,5,20 min,Light Activity,5
+F,23,180,60,129/80,90,8,5,30 min ,Moderate Activity,5
+M,25,180,72,129/80,80,7,6,30 min ,Moderate Activity,5
+M,25,170,55,120/80,90,6,5,40 min ,Active,5
+F,27,180,62,120/80 ,100,6,5,10 min ,Light Activity,7
+F,26,170,61,120/80,70,8,6,10 min ,Light Activity,4
+F,23,175,60,120/80,90,7,5, 30 min,Moderate Activity,5
+F,23,180,60,120/80,70,8,5,20 min ,Light Activity,5
+F,24,180,60,120/80,80,7,5,10 min ,Light Activity,6
+F,26,180,60,129/80,70,7,5,30 min ,Moderate Activity,5
+F,26,180,60,120/80,80,8,5,20 min,Moderate Activity,5
+M,29,170,65,129/80,90,7,6,30 min ,Moderate Activity,4
+M,27,180,75,129/80,80,8,5,20 min ,Moderate Activity,5
+M,24,170,71,120/80,90,7,6,10 min ,Light Activity,4
+F,20,175,58,129/80,80,8,4,20 min,Light Activity,3
+F,85,180,75,129/80,80,8,7,40 min ,Active,5
+F,27,160,55,129/80,70,8,7,40 min ,Active,3
+M,28,180,72,139/80,90,9,6,30 min ,Moderate Activity,5
+M,27,160,55,130/80,80,7,6,20 min,Light Activity,5
+F,25,175,65,120/80,80,7,6,30 min ,Light Activity,3
+M,23,180,60,129/.80,70,7,4,20 min,Light Activity,4
+F,23,180,60,120/80,80,8,5,40 min ,Moderate Activity,5
+F,24,180,70,120/80,80,8,5,40 min ,Moderate Activity,5
+M,23,180,70,120/80,80,7,5,30 min ,Moderate Activity,5
+F,23,180,70,120/80,80,7,5,30 min ,Moderate Activity,5
+F,23,180,70,120/70,75,6,6,30 min ,Moderate Activity,6
+F,24,175,65,120/80,90,7,4,30 min ,Moderate Activity,5
+M,26,160,50,120/70,80,6,5,20 min,Light Activity,5
+M,21,180,70,120/80,80,6,5,40 min ,Moderate Activity,5
+F,20,180,70,120/90,90,8,7,20 min,Active,5
+F,25,180,70,120/80,80,7,5,40 min ,Moderate Activity,5
+F,27,180,70,120/100,105,5,3,50 min ,Moderate Activity,7
+M,26,175,70,120/70,80,7,5,40 min ,Moderate Activity,5
+M,20,175,60,120/70,70,7,5,50 min ,Moderate Activity,5
+M,20,180,55,120/90,90,7,5,20 min ,Moderate Activity,5
+M,24,150,55,120/70,85,8,5,30 min ,Moderate Activity,5
+F,25,180,70,120/90,85,7,5,40 min ,Moderate Activity,5
+F,23,140,45,120/70,80,8,5,20 min ,Light Activity,5
+F,24,150,39,120/80,75,6,5,40 min ,Very Active ,8
+M,20,169,48,120/80,60,6,6,50 min ,Very Active ,10
+M,24,150,50,120/75,80,5,5,50 min ,Light Activity,5
+F,25,180,70,120/90,80,6,5,40 min ,Moderate Activity,5
+F,26,180,55,120/70,85,7,5,40 min ,Moderate Activity,5
+M,23,140,45,120/90,90,8,5,20 min ,Moderate Activity,5
+F,27,140,40,120/60,90,7,4,40 min ,Moderate Activity,5
+F,20,180,70,120/90,95,7,5,40 min ,Light Activity,5
+M,23,185,75,120/70,90,6,5,40 min ,Moderate Activity,5
+M,28,165,58,120/90,120,7,5,10 min ,Light Activity,5
+F,23,160,55,120/80,60,6,4,30 min ,Light Activity,5
+F,24,180,60,120/70,70,7,5,40 min ,Light Activity,5
+M,25,180,70,120/70,70,8,5,40 min ,Light Activity,5
+F,27,185,60,120/80,90,8,5,20 min ,Light Activity,5
+M,26,180,70,120/70,70,8,5,30 min ,Light Activity,5
+M,26,180,63,120/90,80,7,5,20 min ,Light Activity,5
+M,22,175,62,120/70,80,8,4,30 min ,Moderate Activity,4
+F,24,180,55,120/90,85,7,3,40 min ,Active,3
+F,20,180,55,120/80,80,8,7,20 min ,Light Activity,8
+F,27,170,65,129/80,90,8,7,10 min ,Sedentary,6
+F,21,180,69,120/80,90,7,5,40 min ,Moderate Activity,5
+F,23,165,55,120/80,80,6,5,20 min ,Light Activity,5
+F,20,175,54,120/80,78,7,7,35 min ,Moderate Activity,7
+F,23,180,75,120/80,65,6,8,27 min,Moderate Activity,8
+F,18,160,40,120/80,60,7,5,20 min ,Active,5
+M,24,160,57,110/80,75,8,10,28 min ,Moderate Activity,8
+F,26,170,55,110/80,75,8,5,23 min ,Light Activity,3
+F,29,190,80,120/100,68,7,5,29 min ,Active,5
+F,26,170,55,110/80,75,8,5,23 min ,Light Activity,3
+M,24,175,54,130/80,64,5,5,26 min ,Light Activity,5
+F,22,168,49,110/80,65,8,6,26 min ,Light Activity,7
+F,24,145,45,120/80,90,8,5,20 min ,Light Activity,5
+M,20,178,60,120/80,68,4,7,20 min ,Sedentary,7
+F,24,170,60,120/80,80,6,6,48 min ,Active,2
+F,23,180,72,120/70,70,5,5,20 min ,Light Activity,5
+F,24,180,62,120/70,80,8,5,40 min ,Light Activity,5
+M,23,160,30,120/80,75,6,4,40 min ,Active,6
+F,19,170,70,112/80,70,6,6,60 min ,Moderate Activity,8
+F,18,180,45,120/80,65,6,7,20 min ,Moderate Activity,6
+M,24,190,68,120/80,75,6,6,25 min ,Light Activity,6
+M,20,175,67,120/80,65,6,3,60 min ,Moderate Activity,7
+F,21,167,70,120/80,75,8,8,55 min ,Moderate Activity,4
+F,25,180,63,120/80,80,8,5,40 min ,Light Activity,5
+M,23,140,49,120/80,80,7,5,40 min ,Light Activity,5
+F,21,160,75,110/80,90,8,4,60 min ,Light Activity,4
+M,21,165,42,110/80,80,8,8,40 min ,Light Activity,2
+F,20,179,55,120/80,90,6,6,55 min ,Light Activity,3
+M,21,165,42,110/80,80,8,8,40 min ,Light Activity,2
+F,25,180,70,130/80,70,6,7,40 min ,Moderate Activity,4
+M,27,180,60,130/80,90,5,7,40 min ,Moderate Activity,6
+M,24,180,55,120/80,80,8,7,40 min ,Active,6
+F,25,175,60,120/80,80,8,5,40 min ,Moderate Activity,5
+F,25,180,50,120/90,80,8,6,50 min ,Light Activity,6
+M,24,180,70,120/90,80,8,5,40 min ,Moderate Activity,5
+F,24,175,60,120/80,80,7,5,30 min ,Moderate Activity,5
+M,23,180,70,120/90,90,7,5,60 min ,Moderate Activity,5
+M,22,180,70,120/70,90,7,5,50 min ,Moderate Activity,5
+F,24,175,60,120/70,75,9,4,30 min ,Moderate Activity,4
+M,18,170,45,120/80,75,5,5,60 min ,Light Activity,2
+M,21,170,75,120/80,75,4,4,30 min ,Light Activity,3
+F,20,160,42,120/80,65,6,6,60 min ,Moderate Activity,4
+M,21,170,75,120/80,75,4,4,30 min ,Light Activity,3
+M,21,169,62,110/80,65,7,8,50 min ,Light Activity,7
+F,18,170,68,105/80,80,6,5,30 min ,Moderate Activity,5
+M,24,175,60,120/90,90,9,4,40 min ,Moderate Activity,4
+M,24,170,62,120/80,80,7,4,25 min ,Light Activity,4

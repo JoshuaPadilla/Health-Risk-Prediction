@@ -1,0 +1,24 @@
+{
+    "raw_rows": 356,
+    "duplicate_rows_removed": 5,
+    "rows_after_deduplication": 351,
+    "feature_missing_counts_before_drop": {
+        "Gender": 0,
+        "Age": 1,
+        "Sleep Duration": 2,
+        "Quality of Sleep": 2,
+        "Physical Activity Level": 3,
+        "Stress Level": 1,
+        "BMI Category": 1,
+        "Heart Rate": 2,
+        "Daily Steps": 0,
+        "SystolicBP": 27,
+        "DiastolicBP": 27
+    },
+    "rows_dropped_after_cleaning": 35,
+    "rows_kept_for_evaluation": 316,
+    "target_distribution": {
+        "low_risk": 260,
+        "high_risk": 56
+    }
+}

@@ -1,55 +1,55 @@
 [
     {
         "algorithm": "Logistic Regression",
-        "accuracy": 79.5,
-        "precision": 77.3,
-        "recall": 79.5,
-        "f1_score": 77.0,
+        "accuracy": 83.5,
+        "precision": 81.5,
+        "recall": 83.5,
+        "f1_score": 82.1,
         "status": "Ready",
         "confusion_matrix": [
             [
-                95,
-                6
+                244,
+                16
             ],
             [
-                21,
-                10
+                36,
+                20
             ]
         ]
     },
     {
         "algorithm": "Random Forest",
-        "accuracy": 77.3,
-        "precision": 74.0,
-        "recall": 77.3,
-        "f1_score": 74.2,
+        "accuracy": 81.3,
+        "precision": 78.9,
+        "recall": 81.3,
+        "f1_score": 79.8,
         "status": "Ready",
         "confusion_matrix": [
             [
-                94,
-                7
+                240,
+                20
             ],
             [
-                23,
-                8
+                39,
+                17
             ]
         ]
     },
     {
         "algorithm": "SVM",
-        "accuracy": 60.6,
-        "precision": 74.2,
-        "recall": 60.6,
-        "f1_score": 63.6,
+        "accuracy": 57.0,
+        "precision": 78.7,
+        "recall": 57.0,
+        "f1_score": 61.9,
         "status": "Ready",
         "confusion_matrix": [
             [
-                58,
-                43
+                139,
+                121
             ],
             [
-                9,
-                22
+                15,
+                41
             ]
         ]
     }
