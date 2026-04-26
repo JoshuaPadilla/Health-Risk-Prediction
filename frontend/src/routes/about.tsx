@@ -7,6 +7,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { aboutObjectives } from "@/static_data/about_objectives";
+import { LocalBenchmarks } from "@/static_data/local_benchmarks";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion, type Variants } from "framer-motion";
 import {
@@ -103,6 +104,137 @@ const staggerContainer: Variants = {
 		},
 	},
 };
+
+const localBenchmarkPalette: Record<string, string> = {
+	"Logistic Regression": "#10b981",
+	SVM: "#0ea5e9",
+	"Random Forest": "#f59e0b",
+};
+
+const localBenchmarkMap = new Map(
+	LocalBenchmarks.map((entry) => [entry.algorithm, entry]),
+);
+
+type ComparableBenchmarkEntry = {
+	accuracy: number;
+	precision: number;
+	recall: number;
+	f1_score: number;
+	confusion_matrix: number[][];
+};
+
+function formatBenchmarkValue(value?: number | null) {
+	if (value == null || Number.isNaN(value)) {
+		return "--";
+	}
+
+	return `${value.toFixed(1)}%`;
+}
+
+function getMatrixValue(
+	entry: ComparableBenchmarkEntry | null | undefined,
+	row: number,
+	column: number,
+) {
+	return entry?.confusion_matrix[row]?.[column] ?? 0;
+}
+
+function AboutBenchmarkPanel({
+	title,
+	caption,
+	entry,
+	accentColor,
+	panelClassName,
+}: {
+	title: string;
+	caption: string;
+	entry: ComparableBenchmarkEntry | null;
+	accentColor: string;
+	panelClassName: string;
+}) {
+	return (
+		<div className={panelClassName}>
+			<div className="flex items-start justify-between gap-3">
+				<div>
+					<p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">
+						{title}
+					</p>
+					<p className="mt-2 text-sm text-slate-500">{caption}</p>
+				</div>
+				<div
+					className="rounded-full px-2.5 py-1 text-[11px] font-bold"
+					style={{
+						backgroundColor: `${accentColor}14`,
+						color: accentColor,
+					}}
+				>
+					{formatBenchmarkValue(entry?.f1_score)} F1
+				</div>
+			</div>
+
+			<div className="mt-4 grid grid-cols-2 gap-2 text-center">
+				{[
+					{ label: "Accuracy", value: entry?.accuracy },
+					{ label: "Precision", value: entry?.precision },
+					{ label: "Recall", value: entry?.recall },
+					{ label: "F1 Score", value: entry?.f1_score },
+				].map((metric) => (
+					<div
+						key={`${title}-${metric.label}`}
+						className="rounded-2xl border border-white/80 bg-white/90 px-3 py-3"
+					>
+						<div className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+							{metric.label}
+						</div>
+						<div className="mt-2 text-sm font-bold text-slate-900">
+							{formatBenchmarkValue(metric.value)}
+						</div>
+					</div>
+				))}
+			</div>
+
+			<div className="mt-4 border-t border-slate-200/80 pt-4">
+				<p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-center">
+					Confusion Matrix
+				</p>
+				<div className="mt-3 grid grid-cols-2 gap-2 text-center font-mono text-xs">
+					<div className="rounded-2xl bg-emerald-50 px-3 py-4 text-emerald-700">
+						<div className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-500">
+							TN
+						</div>
+						<div className="mt-2 text-lg font-bold">
+							{getMatrixValue(entry, 0, 0)}
+						</div>
+					</div>
+					<div className="rounded-2xl bg-rose-50 px-3 py-4 text-rose-700">
+						<div className="text-[10px] font-bold uppercase tracking-[0.18em] text-rose-500">
+							FP
+						</div>
+						<div className="mt-2 text-lg font-bold">
+							{getMatrixValue(entry, 0, 1)}
+						</div>
+					</div>
+					<div className="rounded-2xl bg-rose-50 px-3 py-4 text-rose-700">
+						<div className="text-[10px] font-bold uppercase tracking-[0.18em] text-rose-500">
+							FN
+						</div>
+						<div className="mt-2 text-lg font-bold">
+							{getMatrixValue(entry, 1, 0)}
+						</div>
+					</div>
+					<div className="rounded-2xl bg-emerald-50 px-3 py-4 text-emerald-700">
+						<div className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-500">
+							TP
+						</div>
+						<div className="mt-2 text-lg font-bold">
+							{getMatrixValue(entry, 1, 1)}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
 
 function RouteComponent() {
 	useEffect(() => {
@@ -356,15 +488,14 @@ function RouteComponent() {
 						</div>
 
 						<div className="grid lg:grid-cols-3 gap-8">
-							{/* Chart Section */}
 							<Card className="lg:col-span-2 border border-slate-200 shadow-xl shadow-slate-200/50 rounded-[2rem] bg-white overflow-hidden">
 								<CardHeader className="p-8 pb-2">
 									<CardTitle className="text-xl font-bold text-slate-900">
 										Accuracy Comparison
 									</CardTitle>
 									<CardDescription className="text-slate-500">
-										Testing results on validation dataset
-										(Top 3 Algorithms)
+										Reference benchmark accuracy beside the
+										locally evaluated dataset.
 									</CardDescription>
 								</CardHeader>
 								<CardContent className="p-8">
@@ -444,130 +575,72 @@ function RouteComponent() {
 								</CardContent>
 							</Card>
 
-							{/* Detailed Metrics List with Confusion Matrix */}
 							<div className="space-y-4">
-								{ModelBenchmarks.map((model, i) => (
-									<Card
-										key={i}
-										className="border border-slate-200 shadow-lg shadow-slate-200/50 rounded-3xl bg-white overflow-hidden group hover:scale-[1.02] transition-transform duration-300"
-									>
-										<div
-											className="h-1.5 w-full"
-											style={{
-												backgroundColor: model.color,
-											}}
-										/>
-										<CardHeader className="p-6 pb-2">
-											<CardTitle className="text-base font-bold flex justify-between items-center text-slate-900">
-												{model.algorithm}
-												<span
-													className="text-xs font-mono font-bold bg-slate-100 px-2 py-1 rounded-md"
-													style={{
-														color: model.color,
-													}}
-												>
-													{model.accuracy}% Acc
-												</span>
-											</CardTitle>
-										</CardHeader>
-										<CardContent className="p-6 pt-2 space-y-4">
-											{/* Metric Grid */}
-											<div className="grid grid-cols-3 gap-2 text-center">
-												<div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
-													<div className="font-bold text-slate-700 text-sm">
-														{model.precision}%
-													</div>
-													<div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mt-1">
-														Prec
-													</div>
-												</div>
-												<div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
-													<div className="font-bold text-slate-700 text-sm">
-														{model.recall}%
-													</div>
-													<div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mt-1">
-														Recall
-													</div>
-												</div>
-												<div
-													className="p-2 rounded-xl border"
-													style={{
-														backgroundColor: `${model.color}10`,
-														borderColor: `${model.color}30`,
-													}}
-												>
-													<div
-														className="font-bold text-sm"
-														style={{
-															color: model.color,
-														}}
-													>
-														{model.f1_score}%
-													</div>
-													<div
-														className="text-[10px] uppercase tracking-wider font-bold mt-1 opacity-70"
-														style={{
-															color: model.color,
-														}}
-													>
-														F1
-													</div>
-												</div>
-											</div>
+								{ModelBenchmarks.map((model, index) => {
+									const localModel =
+										localBenchmarkMap.get(
+											model.algorithm,
+										) ?? null;
+									const f1Gap =
+										localModel == null
+											? null
+											: model.f1_score -
+												localModel.f1_score;
 
-											{/* Confusion Matrix Visualization */}
-											<div className="pt-2 border-t border-slate-100">
-												<p className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2 text-center">
-													Confusion Matrix
-												</p>
-												<div className="grid grid-cols-2 gap-1 text-center font-mono text-xs">
-													{/* Top Row */}
-													<div
-														className="py-2 rounded bg-slate-50 text-slate-600"
-														title="True Negative"
+									return (
+										<Card
+											key={index}
+											className="border border-slate-200 shadow-lg shadow-slate-200/50 rounded-3xl bg-white overflow-hidden group hover:scale-[1.02] transition-transform duration-300"
+										>
+											<div
+												className="h-1.5 w-full"
+												style={{
+													backgroundColor:
+														model.color,
+												}}
+											/>
+											<CardHeader className="p-6 pb-2">
+												<CardTitle className="flex items-center justify-between gap-3 text-base font-bold text-slate-900">
+													{model.algorithm}
+													<span
+														className="rounded-md bg-slate-100 px-2 py-1 text-xs font-mono font-bold"
+														style={{
+															color: model.color,
+														}}
 													>
-														TN:{" "}
-														{
-															model
-																.confusion_matrix[0][0]
+														{f1Gap == null
+															? "No local match"
+															: `${f1Gap > 0 ? "+" : ""}${f1Gap.toFixed(1)} F1 gap`}
+													</span>
+												</CardTitle>
+											</CardHeader>
+											<CardContent className="p-6 pt-2">
+												<div className="grid gap-4 md:grid-cols-2">
+													<AboutBenchmarkPanel
+														title="Reference Benchmark"
+														caption="Published model benchmark values used as the baseline."
+														entry={model}
+														accentColor={
+															model.color
 														}
-													</div>
-													<div
-														className="py-2 rounded bg-red-50 text-red-500 font-bold"
-														title="False Positive"
-													>
-														FP:{" "}
-														{
-															model
-																.confusion_matrix[0][1]
+														panelClassName="rounded-[1.5rem] border border-slate-200 bg-slate-50/80 p-4"
+													/>
+													<AboutBenchmarkPanel
+														title="Local Evaluation"
+														caption="Measured on the local survey dataset for presentation comparison."
+														entry={localModel}
+														accentColor={
+															localBenchmarkPalette[
+																model.algorithm
+															] ?? model.color
 														}
-													</div>
-													{/* Bottom Row */}
-													<div
-														className="py-2 rounded bg-red-50 text-red-500 font-bold"
-														title="False Negative"
-													>
-														FN:{" "}
-														{
-															model
-																.confusion_matrix[1][0]
-														}
-													</div>
-													<div
-														className="py-2 rounded bg-slate-50 text-slate-600"
-														title="True Positive"
-													>
-														TP:{" "}
-														{
-															model
-																.confusion_matrix[1][1]
-														}
-													</div>
+														panelClassName="rounded-[1.5rem] border border-emerald-100 bg-emerald-50/70 p-4"
+													/>
 												</div>
-											</div>
-										</CardContent>
-									</Card>
-								))}
+											</CardContent>
+										</Card>
+									);
+								})}
 							</div>
 						</div>
 					</motion.div>
@@ -577,9 +650,7 @@ function RouteComponent() {
 						variants={fadeInUp}
 						className="rounded-[2.5rem] border border-slate-800 bg-[#0F172A] p-8 md:p-12 shadow-2xl relative overflow-hidden group"
 					>
-						{/* Background Grid inside pipeline */}
 						<div className="absolute inset-0 bg-[linear-gradient(to_right,#334155_1px,transparent_1px),linear-gradient(to_bottom,#334155_1px,transparent_1px)] bg-[size:30px_30px] opacity-20" />
-
 						<div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-full blur-[80px]" />
 						<div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px]" />
 
@@ -588,8 +659,7 @@ function RouteComponent() {
 							Data Flow Pipeline
 						</h3>
 
-						<div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 relative z-10">
-							{/* Step 1 */}
+						<div className="relative z-10 flex flex-col items-center justify-center gap-4 md:flex-row md:gap-8">
 							<div className="flex flex-col items-center gap-4 group/step">
 								<div className="h-20 w-20 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-blue-400 shadow-xl transition-transform group-hover/step:scale-110 group-hover/step:border-blue-500/50">
 									<Layout className="h-8 w-8" />
@@ -599,10 +669,9 @@ function RouteComponent() {
 								</span>
 							</div>
 
-							<ArrowRight className="text-slate-600 h-6 w-6 hidden md:block" />
-							<ArrowRight className="text-slate-600 h-6 w-6 md:hidden rotate-90" />
+							<ArrowRight className="hidden h-6 w-6 text-slate-600 md:block" />
+							<ArrowRight className="h-6 w-6 rotate-90 text-slate-600 md:hidden" />
 
-							{/* Step 2 */}
 							<div className="flex flex-col items-center gap-4 group/step">
 								<div className="h-20 w-20 rounded-2xl bg-slate-800 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shadow-[0_0_20px_-5px_rgba(99,102,241,0.2)] transition-transform group-hover/step:scale-110 group-hover/step:border-indigo-500/60">
 									<Server className="h-8 w-8" />
@@ -612,10 +681,9 @@ function RouteComponent() {
 								</span>
 							</div>
 
-							<ArrowRight className="text-slate-600 h-6 w-6 hidden md:block" />
-							<ArrowRight className="text-slate-600 h-6 w-6 md:hidden rotate-90" />
+							<ArrowRight className="hidden h-6 w-6 text-slate-600 md:block" />
+							<ArrowRight className="h-6 w-6 rotate-90 text-slate-600 md:hidden" />
 
-							{/* Step 3 */}
 							<div className="flex flex-col items-center gap-4 group/step">
 								<div className="h-20 w-20 rounded-2xl bg-slate-800 border border-teal-500/30 flex items-center justify-center text-teal-400 shadow-[0_0_20px_-5px_rgba(45,212,191,0.2)] transition-transform group-hover/step:scale-110 group-hover/step:border-teal-500/60">
 									<BrainCircuit className="h-8 w-8" />
@@ -625,10 +693,9 @@ function RouteComponent() {
 								</span>
 							</div>
 
-							<ArrowRight className="text-slate-600 h-6 w-6 hidden md:block" />
-							<ArrowRight className="text-slate-600 h-6 w-6 md:hidden rotate-90" />
+							<ArrowRight className="hidden h-6 w-6 text-slate-600 md:block" />
+							<ArrowRight className="h-6 w-6 rotate-90 text-slate-600 md:hidden" />
 
-							{/* Step 4 */}
 							<div className="flex flex-col items-center gap-4 group/step">
 								<div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-teal-500 to-blue-600 border border-teal-400/50 flex items-center justify-center text-white shadow-xl shadow-blue-500/20 transition-transform group-hover/step:scale-110">
 									<Database className="h-8 w-8" />

@@ -1,40 +1,4 @@
 import type { BenchmarkEntry } from "@/static_data/model_benchmarks";
+import localBenchmarksJson from "@prediction/local_benchmarks.json";
 
-export const LocalBenchmarks: BenchmarkEntry[] = [
-	{
-		algorithm: "Logistic Regression",
-		accuracy: 79.5,
-		precision: 77.3,
-		recall: 79.5,
-		f1_score: 77.0,
-		status: "Ready",
-		confusion_matrix: [
-			[95, 6],
-			[21, 10],
-		],
-	},
-	{
-		algorithm: "Random Forest",
-		accuracy: 77.3,
-		precision: 74.0,
-		recall: 77.3,
-		f1_score: 74.2,
-		status: "Ready",
-		confusion_matrix: [
-			[94, 7],
-			[23, 8],
-		],
-	},
-	{
-		algorithm: "SVM",
-		accuracy: 60.6,
-		precision: 74.2,
-		recall: 60.6,
-		f1_score: 63.6,
-		status: "Ready",
-		confusion_matrix: [
-			[58, 43],
-			[9, 22],
-		],
-	},
-];
+export const LocalBenchmarks = localBenchmarksJson as BenchmarkEntry[];

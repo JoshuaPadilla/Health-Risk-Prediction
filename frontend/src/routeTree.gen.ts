@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ModelBenchmarkingRouteImport } from './routes/model-benchmarking'
-import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PredictIndexRouteImport } from './routes/predict/index'
@@ -19,11 +18,6 @@ import { Route as PredictResultRouteImport } from './routes/predict/result'
 const ModelBenchmarkingRoute = ModelBenchmarkingRouteImport.update({
   id: '/model-benchmarking',
   path: '/model-benchmarking',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InsightsRoute = InsightsRouteImport.update({
-  id: '/insights',
-  path: '/insights',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -50,7 +44,6 @@ const PredictResultRoute = PredictResultRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/insights': typeof InsightsRoute
   '/model-benchmarking': typeof ModelBenchmarkingRoute
   '/predict/result': typeof PredictResultRoute
   '/predict/': typeof PredictIndexRoute
@@ -58,7 +51,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/insights': typeof InsightsRoute
   '/model-benchmarking': typeof ModelBenchmarkingRoute
   '/predict/result': typeof PredictResultRoute
   '/predict': typeof PredictIndexRoute
@@ -67,7 +59,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/insights': typeof InsightsRoute
   '/model-benchmarking': typeof ModelBenchmarkingRoute
   '/predict/result': typeof PredictResultRoute
   '/predict/': typeof PredictIndexRoute
@@ -77,23 +68,15 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
-    | '/insights'
     | '/model-benchmarking'
     | '/predict/result'
     | '/predict/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/about'
-    | '/insights'
-    | '/model-benchmarking'
-    | '/predict/result'
-    | '/predict'
+  to: '/' | '/about' | '/model-benchmarking' | '/predict/result' | '/predict'
   id:
     | '__root__'
     | '/'
     | '/about'
-    | '/insights'
     | '/model-benchmarking'
     | '/predict/result'
     | '/predict/'
@@ -102,7 +85,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  InsightsRoute: typeof InsightsRoute
   ModelBenchmarkingRoute: typeof ModelBenchmarkingRoute
   PredictResultRoute: typeof PredictResultRoute
   PredictIndexRoute: typeof PredictIndexRoute
@@ -115,13 +97,6 @@ declare module '@tanstack/react-router' {
       path: '/model-benchmarking'
       fullPath: '/model-benchmarking'
       preLoaderRoute: typeof ModelBenchmarkingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/insights': {
-      id: '/insights'
-      path: '/insights'
-      fullPath: '/insights'
-      preLoaderRoute: typeof InsightsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -158,7 +133,6 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  InsightsRoute: InsightsRoute,
   ModelBenchmarkingRoute: ModelBenchmarkingRoute,
   PredictResultRoute: PredictResultRoute,
   PredictIndexRoute: PredictIndexRoute,

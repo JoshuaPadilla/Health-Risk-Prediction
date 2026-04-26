@@ -195,6 +195,70 @@ function buildInterpretation(
 	return `${strongerSource} results lead by ${Math.abs(f1Delta).toFixed(1)} F1 points and ${Math.abs(accuracyDelta).toFixed(1)} accuracy points.`;
 }
 
+function ConfusionMatrixPanel({
+	title,
+	entry,
+	accentClassName,
+	note,
+}: {
+	title: string;
+	entry: BenchmarkEntry | null;
+	accentClassName: string;
+	note: string;
+}) {
+	const trueNegative = entry?.confusion_matrix[0]?.[0] ?? 0;
+	const falsePositive = entry?.confusion_matrix[0]?.[1] ?? 0;
+	const falseNegative = entry?.confusion_matrix[1]?.[0] ?? 0;
+	const truePositive = entry?.confusion_matrix[1]?.[1] ?? 0;
+
+	return (
+		<div className="rounded-2xl border border-slate-200 bg-white/85 px-4 py-4">
+			<p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">
+				{title}
+			</p>
+			<div className="mt-4 grid grid-cols-2 gap-2 text-center font-mono text-xs">
+				<div className="rounded-2xl bg-emerald-50 px-3 py-3 text-emerald-700">
+					<div className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300/80">
+						TN
+					</div>
+					<div className="mt-2 text-lg font-bold text-slate-950">
+						{trueNegative}
+					</div>
+				</div>
+				<div className="rounded-2xl bg-rose-50 px-3 py-3 text-rose-700">
+					<div className="text-[10px] font-bold uppercase tracking-[0.18em] text-rose-300/80">
+						FP
+					</div>
+					<div className="mt-2 text-lg font-bold text-slate-950">
+						{falsePositive}
+					</div>
+				</div>
+				<div className="rounded-2xl bg-rose-50 px-3 py-3 text-rose-700">
+					<div className="text-[10px] font-bold uppercase tracking-[0.18em] text-rose-300/80">
+						FN
+					</div>
+					<div className="mt-2 text-lg font-bold text-slate-950">
+						{falseNegative}
+					</div>
+				</div>
+				<div className="rounded-2xl bg-emerald-50 px-3 py-3 text-emerald-700">
+					<div className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300/80">
+						TP
+					</div>
+					<div className="mt-2 text-lg font-bold text-slate-950">
+						{truePositive}
+					</div>
+				</div>
+			</div>
+			<div
+				className={`mt-4 inline-flex rounded-full px-2.5 py-1 text-[11px] font-bold ${accentClassName}`}
+			>
+				{note}
+			</div>
+		</div>
+	);
+}
+
 function ResultCard({ row }: { row: ComparisonRow }) {
 	return (
 		<Card className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white/95 shadow-xl shadow-slate-200/60">
@@ -233,6 +297,14 @@ function ResultCard({ row }: { row: ComparisonRow }) {
 							</div>
 						))}
 					</div>
+					<div className="mt-4 border-t border-slate-200 pt-4">
+						<ConfusionMatrixPanel
+							title="Reference confusion matrix"
+							entry={row.production}
+							accentClassName="bg-sky-500/12 text-sky-700"
+							note="Based on the reference benchmark confusion matrix"
+						/>
+					</div>
 				</div>
 
 				<div className="rounded-[1.5rem] border border-emerald-100 bg-emerald-50/70 p-5">
@@ -253,6 +325,14 @@ function ResultCard({ row }: { row: ComparisonRow }) {
 								</span>
 							</div>
 						))}
+					</div>
+					<div className="mt-4 border-t border-emerald-100 pt-4">
+						<ConfusionMatrixPanel
+							title="Local confusion matrix"
+							entry={row.local}
+							accentClassName="bg-emerald-500/12 text-emerald-700"
+							note="Based on the local evaluation confusion matrix"
+						/>
 					</div>
 				</div>
 
