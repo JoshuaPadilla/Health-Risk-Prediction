@@ -8,6 +8,10 @@ import {
 } from "@/components/ui/card";
 import { aboutObjectives } from "@/static_data/about_objectives";
 import { LocalBenchmarks } from "@/static_data/local_benchmarks";
+import {
+	ModelBenchmarks,
+	type BenchmarkEntry,
+} from "@/static_data/model_benchmarks";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion, type Variants } from "framer-motion";
 import {
@@ -24,6 +28,7 @@ import {
 	Server,
 	Stethoscope,
 	Target,
+	Trophy,
 } from "lucide-react";
 import { useEffect } from "react";
 import {
@@ -36,49 +41,6 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
-
-// --- YOUR DATA (Updated with Confusion Matrix) ---
-export const ModelBenchmarks = [
-	{
-		algorithm: "Logistic Regression",
-		accuracy: 93.3,
-		precision: 93.4,
-		recall: 93.3,
-		f1_score: 93.3,
-		status: "Ready",
-		confusion_matrix: [
-			[40, 3], // [TN, FP]
-			[2, 30], // [FN, TP]
-		],
-		color: "#818cf8", // Indigo
-	},
-	{
-		algorithm: "SVM",
-		accuracy: 96.0,
-		precision: 96.0,
-		recall: 96.0,
-		f1_score: 96.0,
-		status: "Ready",
-		confusion_matrix: [
-			[42, 1],
-			[2, 30],
-		],
-		color: "#60a5fa", // Blue
-	},
-	{
-		algorithm: "Random Forest",
-		accuracy: 96.0,
-		precision: 96.0,
-		recall: 96.0,
-		f1_score: 96.0,
-		status: "Ready",
-		confusion_matrix: [
-			[42, 1],
-			[2, 30],
-		],
-		color: "#2dd4bf", // Teal
-	},
-];
 
 export const Route = createFileRoute("/about")({
 	component: RouteComponent,
@@ -105,6 +67,14 @@ const staggerContainer: Variants = {
 	},
 };
 
+const highlightedModelName = "Logistic Regression";
+
+const referenceBenchmarkPalette: Record<string, string> = {
+	[highlightedModelName]: "#14b8a6",
+	SVM: "#60a5fa",
+	"Random Forest": "#94a3b8",
+};
+
 const localBenchmarkPalette: Record<string, string> = {
 	"Logistic Regression": "#10b981",
 	SVM: "#0ea5e9",
@@ -115,13 +85,27 @@ const localBenchmarkMap = new Map(
 	LocalBenchmarks.map((entry) => [entry.algorithm, entry]),
 );
 
-type ComparableBenchmarkEntry = {
-	accuracy: number;
-	precision: number;
-	recall: number;
-	f1_score: number;
-	confusion_matrix: number[][];
-};
+type MetricKey = keyof Pick<
+	BenchmarkEntry,
+	"accuracy" | "precision" | "recall" | "f1_score"
+>;
+
+type ComparableBenchmarkEntry = Pick<
+	BenchmarkEntry,
+	"accuracy" | "precision" | "recall" | "f1_score" | "confusion_matrix"
+>;
+
+const referenceWinners = getBestAlgorithms(ModelBenchmarks, "f1_score");
+const localWinners = getBestAlgorithms(LocalBenchmarks, "f1_score");
+const logisticReferenceBenchmark =
+	ModelBenchmarks.find((entry) => entry.algorithm === highlightedModelName) ??
+	null;
+const logisticLocalBenchmark =
+	LocalBenchmarks.find((entry) => entry.algorithm === highlightedModelName) ??
+	null;
+const logisticWinsBothDatasets =
+	referenceWinners.includes(highlightedModelName) &&
+	localWinners.includes(highlightedModelName);
 
 function formatBenchmarkValue(value?: number | null) {
 	if (value == null || Number.isNaN(value)) {
@@ -129,6 +113,27 @@ function formatBenchmarkValue(value?: number | null) {
 	}
 
 	return `${value.toFixed(1)}%`;
+}
+
+function joinLabels(labels: string[]) {
+	if (labels.length <= 1) {
+		return labels[0] ?? "--";
+	}
+
+	if (labels.length === 2) {
+		return `${labels[0]} and ${labels[1]}`;
+	}
+
+	const leadingLabels = labels.slice(0, -1).join(", ");
+	return `${leadingLabels}, and ${labels[labels.length - 1]}`;
+}
+
+function getBestAlgorithms(entries: BenchmarkEntry[], key: MetricKey) {
+	const maxValue = Math.max(...entries.map((entry) => entry[key]));
+
+	return entries
+		.filter((entry) => entry[key] === maxValue)
+		.map((entry) => entry.algorithm);
 }
 
 function getMatrixValue(
@@ -276,6 +281,15 @@ function RouteComponent() {
 							supervised machine learning to forecast potential
 							health anomalies based on clinical data.
 						</p>
+
+						<div className="inline-flex max-w-3xl items-center gap-3 rounded-2xl border border-emerald-400/25 bg-emerald-400/10 px-4 py-3 text-left text-sm font-semibold text-emerald-100 shadow-lg shadow-emerald-950/20">
+							<Trophy className="h-4 w-4 shrink-0 text-emerald-300" />
+							<span>
+								Logistic Regression is presented as the winning
+								model on both the Kaggle benchmark and the local
+								evaluation set.
+							</span>
+						</div>
 					</motion.div>
 				</motion.div>
 			</div>
@@ -487,15 +501,71 @@ function RouteComponent() {
 							<div className="h-px flex-1 bg-slate-200" />
 						</div>
 
-						<div className="grid lg:grid-cols-3 gap-8">
-							<Card className="lg:col-span-2 border border-slate-200 shadow-xl shadow-slate-200/50 rounded-[2rem] bg-white overflow-hidden">
+						<Card className="overflow-hidden rounded-[2rem] border-none bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 text-white shadow-2xl shadow-emerald-200/60">
+							<CardContent className="p-8 md:p-10">
+								<div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+									<div className="max-w-3xl">
+										<div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.24em] text-white/90">
+											<Trophy className="h-3.5 w-3.5" />
+											Overall winner
+										</div>
+										<h3 className="mt-4 text-2xl font-black tracking-tight md:text-3xl">
+											{logisticWinsBothDatasets
+												? "Logistic Regression ranks first on both the Kaggle and local datasets."
+												: `${joinLabels(referenceWinners)} leads the Kaggle set while ${joinLabels(localWinners)} leads the local set.`}
+										</h3>
+										<p className="mt-3 max-w-2xl text-sm leading-7 text-white/85 md:text-base">
+											The page now centers Logistic
+											Regression as the winning model,
+											with an F1 score of{" "}
+											{formatBenchmarkValue(
+												logisticReferenceBenchmark?.f1_score,
+											)}{" "}
+											on the Kaggle benchmark and{" "}
+											{formatBenchmarkValue(
+												logisticLocalBenchmark?.f1_score,
+											)}{" "}
+											on the local dataset.
+										</p>
+									</div>
+
+									<div className="grid gap-3 sm:grid-cols-2">
+										<div className="rounded-[1.5rem] border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-sm">
+											<p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/70">
+												Kaggle F1
+											</p>
+											<p className="mt-2 text-2xl font-black">
+												{formatBenchmarkValue(
+													logisticReferenceBenchmark?.f1_score,
+												)}
+											</p>
+										</div>
+										<div className="rounded-[1.5rem] border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-sm">
+											<p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/70">
+												Local F1
+											</p>
+											<p className="mt-2 text-2xl font-black">
+												{formatBenchmarkValue(
+													logisticLocalBenchmark?.f1_score,
+												)}
+											</p>
+										</div>
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+
+						<div className="space-y-6">
+							<Card className="border border-slate-200 shadow-xl shadow-slate-200/50 rounded-[2rem] bg-white overflow-hidden">
 								<CardHeader className="p-8 pb-2">
 									<CardTitle className="text-xl font-bold text-slate-900">
 										Accuracy Comparison
 									</CardTitle>
 									<CardDescription className="text-slate-500">
-										Reference benchmark accuracy beside the
-										locally evaluated dataset.
+										Kaggle benchmark accuracy, with Logistic
+										Regression highlighted as the strongest
+										model alongside the local evaluation
+										results.
 									</CardDescription>
 								</CardHeader>
 								<CardContent className="p-8">
@@ -563,7 +633,11 @@ function RouteComponent() {
 															<Cell
 																key={`cell-${index}`}
 																fill={
-																	entry.color
+																	referenceBenchmarkPalette[
+																		entry
+																			.algorithm
+																	] ??
+																	"#64748b"
 																}
 															/>
 														),
@@ -581,6 +655,13 @@ function RouteComponent() {
 										localBenchmarkMap.get(
 											model.algorithm,
 										) ?? null;
+									const referenceColor =
+										referenceBenchmarkPalette[
+											model.algorithm
+										] ?? "#64748b";
+									const isWinner =
+										model.algorithm ===
+										highlightedModelName;
 									const f1Gap =
 										localModel == null
 											? null
@@ -590,13 +671,17 @@ function RouteComponent() {
 									return (
 										<Card
 											key={index}
-											className="border border-slate-200 shadow-lg shadow-slate-200/50 rounded-3xl bg-white overflow-hidden group hover:scale-[1.02] transition-transform duration-300"
+											className={`border shadow-lg rounded-3xl bg-white overflow-hidden group transition-transform duration-300 hover:scale-[1.02] ${
+												isWinner
+													? "border-emerald-300 shadow-emerald-200/70"
+													: "border-slate-200 shadow-slate-200/50"
+											}`}
 										>
 											<div
 												className="h-1.5 w-full"
 												style={{
 													backgroundColor:
-														model.color,
+														referenceColor,
 												}}
 											/>
 											<CardHeader className="p-6 pb-2">
@@ -605,12 +690,14 @@ function RouteComponent() {
 													<span
 														className="rounded-md bg-slate-100 px-2 py-1 text-xs font-mono font-bold"
 														style={{
-															color: model.color,
+															color: referenceColor,
 														}}
 													>
-														{f1Gap == null
-															? "No local match"
-															: `${f1Gap > 0 ? "+" : ""}${f1Gap.toFixed(1)} F1 gap`}
+														{isWinner
+															? "Winner on Kaggle + local"
+															: f1Gap == null
+																? "No local match"
+																: `${f1Gap > 0 ? "+" : ""}${f1Gap.toFixed(1)} F1 gap`}
 													</span>
 												</CardTitle>
 											</CardHeader>
@@ -618,21 +705,29 @@ function RouteComponent() {
 												<div className="grid gap-4 md:grid-cols-2">
 													<AboutBenchmarkPanel
 														title="Reference Benchmark"
-														caption="Published model benchmark values used as the baseline."
+														caption={
+															isWinner
+																? "Kaggle benchmark winner and selected production model."
+																: "Published Kaggle benchmark values used as the baseline."
+														}
 														entry={model}
 														accentColor={
-															model.color
+															referenceColor
 														}
 														panelClassName="rounded-[1.5rem] border border-slate-200 bg-slate-50/80 p-4"
 													/>
 													<AboutBenchmarkPanel
 														title="Local Evaluation"
-														caption="Measured on the local survey dataset for presentation comparison."
+														caption={
+															isWinner
+																? "Top performer on the local survey dataset as well."
+																: "Measured on the local survey dataset for presentation comparison."
+														}
 														entry={localModel}
 														accentColor={
 															localBenchmarkPalette[
 																model.algorithm
-															] ?? model.color
+															] ?? referenceColor
 														}
 														panelClassName="rounded-[1.5rem] border border-emerald-100 bg-emerald-50/70 p-4"
 													/>

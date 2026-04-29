@@ -11,14 +11,14 @@ export type BenchmarkEntry = {
 export const ModelBenchmarks: BenchmarkEntry[] = [
 	{
 		algorithm: "Logistic Regression",
-		accuracy: 93.3,
-		precision: 93.4,
-		recall: 93.3,
-		f1_score: 93.3,
+		accuracy: 97.3,
+		precision: 97.4,
+		recall: 97.3,
+		f1_score: 97.3,
 		status: "Ready",
 		confusion_matrix: [
-			[40, 3],
-			[2, 30],
+			[42, 1],
+			[1, 31],
 		],
 	},
 	{

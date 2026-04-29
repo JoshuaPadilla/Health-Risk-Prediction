@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import type { Department } from "@/enums/departments.enum";
+import { Models } from "@/enums/models.enum";
 import { validatePredictionForm } from "@/helpers/form_validatation";
 import { cn } from "@/lib/utils";
 import { Assessment_Steps } from "@/static_data/assessment_steps";
@@ -20,7 +21,6 @@ import {
 	AlertCircle,
 	ArrowLeft,
 	ArrowRight,
-	Binary,
 	Building2,
 	Calculator,
 	Check,
@@ -29,11 +29,9 @@ import {
 	HeartPulse,
 	Lock,
 	Moon,
-	Network,
 	Ruler,
 	Sparkles,
 	Timer,
-	Trees,
 	Weight,
 	XCircle,
 } from "lucide-react";
@@ -67,7 +65,7 @@ function RouteComponent() {
 	const { sendPrediction, isLoading } = usePredictionStore();
 	const [step, setStep] = useState(1);
 	const [direction, setDirection] = useState(0);
-	const totalSteps = 4;
+	const totalSteps = Assessment_Steps.length;
 
 	// State to hold the raw BMI number for display purposes
 	const [calculatedBmi, setCalculatedBmi] = useState<number | null>(null);
@@ -87,7 +85,7 @@ function RouteComponent() {
 		heart_rate: 0,
 		systolic_bp: 0,
 		diastolic_bp: 0,
-		model: "forest",
+		model: Models.LOGISTIC,
 	});
 
 	const updateField = (
@@ -159,7 +157,12 @@ function RouteComponent() {
 	const currentStepData = Assessment_Steps[step - 1];
 
 	const handleSubmit = async () => {
-		const validation = validatePredictionForm(formData);
+		const submissionData = {
+			...formData,
+			model: Models.LOGISTIC,
+		};
+
+		const validation = validatePredictionForm(submissionData);
 
 		if (!validation.success) {
 			validation.errors.forEach((errorMsg) => {
@@ -193,7 +196,7 @@ function RouteComponent() {
 		}
 
 		try {
-			await sendPrediction(formData);
+			await sendPrediction(submissionData);
 			navigate({ to: "/predict/result" });
 		} catch (error) {
 			console.error(error);
@@ -850,138 +853,6 @@ function RouteComponent() {
 														</div>
 													</div>
 												</div>
-											</div>
-										</div>
-									)}
-
-									{/* STEP 4: MODEL SELECTION */}
-									{step === 4 && (
-										<div className="space-y-6 max-w-3xl mx-auto">
-											<div className="text-center md:text-left">
-												<h3 className="text-xl font-bold text-slate-900">
-													Select Prediction Model
-												</h3>
-												<p className="text-slate-500">
-													Choose the machine learning
-													algorithm to process your
-													health data.
-												</p>
-											</div>
-
-											<div className="grid grid-cols-1 gap-4 mt-4">
-												{[
-													{
-														id: "forest",
-														label: "Random Forest",
-														desc: "High accuracy ensemble method using multiple decision trees. Best for complex datasets.",
-														icon: Trees,
-														color: "text-emerald-600",
-														bg: "bg-emerald-50",
-														border: "border-emerald-200",
-														activeBorder:
-															"border-emerald-500",
-														activeBg:
-															"bg-emerald-50/50",
-													},
-													{
-														id: "svm",
-														label: "Support Vector Machine",
-														desc: "Robust classification algorithm effective in high-dimensional spaces.",
-														icon: Network,
-														color: "text-purple-600",
-														bg: "bg-purple-50",
-														border: "border-purple-200",
-														activeBorder:
-															"border-purple-500",
-														activeBg:
-															"bg-purple-50/50",
-													},
-													{
-														id: "logistic",
-														label: "Logistic Regression",
-														desc: "Statistical model used for binary classification. Fast and interpretable.",
-														icon: Binary,
-														color: "text-blue-600",
-														bg: "bg-blue-50",
-														border: "border-blue-200",
-														activeBorder:
-															"border-blue-500",
-														activeBg:
-															"bg-blue-50/50",
-													},
-												].map((model) => (
-													<motion.div
-														key={model.id}
-														whileHover={{
-															scale: 1.01,
-															y: -2,
-														}}
-														whileTap={{
-															scale: 0.99,
-														}}
-														onClick={() =>
-															updateField(
-																"model",
-																model.id,
-															)
-														}
-														className={cn(
-															"cursor-pointer relative flex items-start gap-5 p-6 rounded-2xl border-2 transition-all duration-300",
-															formData.model ===
-																model.id
-																? cn(
-																		model.activeBorder,
-																		model.activeBg,
-																		"shadow-lg",
-																	)
-																: "border-slate-100 bg-white hover:border-slate-200 hover:shadow-md",
-														)}
-													>
-														<div
-															className={cn(
-																"p-4 rounded-xl shrink-0 shadow-sm",
-																model.bg,
-															)}
-														>
-															<model.icon
-																className={cn(
-																	"w-7 h-7",
-																	model.color,
-																)}
-															/>
-														</div>
-														<div className="flex-1 py-0.5">
-															<div className="flex items-center justify-between">
-																<h3 className="font-bold text-lg text-slate-900">
-																	{
-																		model.label
-																	}
-																</h3>
-																{formData.model ===
-																	model.id && (
-																	<motion.span
-																		initial={{
-																			scale: 0,
-																		}}
-																		animate={{
-																			scale: 1,
-																		}}
-																		className={cn(
-																			"text-xs font-bold px-2 py-1 rounded-full bg-white border",
-																			model.color,
-																			model.border,
-																		)}
-																	>
-																		SELECTED
-																	</motion.span>
-																)}
-															</div>
-															<p className="text-slate-500 mt-2 leading-relaxed text-sm">
-																{model.desc}
-															</p>
-														</div>
-													</motion.div>
-												))}
 											</div>
 										</div>
 									)}

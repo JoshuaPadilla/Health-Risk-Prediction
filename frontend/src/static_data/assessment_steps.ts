@@ -1,4 +1,4 @@
-import { Cpu, HeartPulse, Moon, User } from "lucide-react";
+import { HeartPulse, Moon, User } from "lucide-react";
 
 export const Assessment_Steps = [
 	{
@@ -24,13 +24,5 @@ export const Assessment_Steps = [
 		icon: HeartPulse,
 		desc: "Measurable physiological outcomes.",
 		image: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?q=80&w=2070&auto=format&fit=crop",
-	},
-	{
-		id: 4,
-		shortTitle: "04. Analysis",
-		title: "Model Selection",
-		icon: Cpu,
-		desc: "Choose the algorithm for prediction.",
-		image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop",
 	},
 ];
